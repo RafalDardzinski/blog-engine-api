@@ -106,6 +106,9 @@ describe(`Controller ${__dirname}`, () => {
       routes.forEach((route) => {
         expect(route.setContext).to.have.been.called.with(unitUnderTest);
       });
+
+      // Cleanup
+      sandbox.restore();
     });
 
     it('adds each route to Controller#routes', () => {
