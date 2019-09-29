@@ -1,7 +1,7 @@
 /**
  * Builds top-level request handler for http server incoming requests.
  */
-class ApplicationBuilder {
+class WebApplicationBuilder {
   /**
    * @param {Function} appFactory Factory function that returns top level request handlers.
    * @param {Function} routerFactory Factory function that returns routers.
@@ -16,6 +16,7 @@ class ApplicationBuilder {
   /**
    * Builds requests handler.
    * @param {WebApplicationComponents} components Components to build application from.
+   * @returns {Function} Http server request handler function.
    */
   build(components) {
     components.validateSelf();
@@ -28,6 +29,7 @@ class ApplicationBuilder {
   /**
    * Builds router applicable to top-level request handler.
    * @param {Controller} controller Controller to build router from.
+   * @returns {Function} Router function applicable to the request handler.
    */
   createRouter(controller) {
     controller.validateSelf();
@@ -53,7 +55,7 @@ class ApplicationBuilder {
   }
 }
 
-module.exports = ApplicationBuilder;
+module.exports = WebApplicationBuilder;
 /**
  * @typedef {import('./web-application-build-strategy')} WebApplicationBuildStrategy
  * @typedef {import('./web-application-components')} WebApplicationComponents
