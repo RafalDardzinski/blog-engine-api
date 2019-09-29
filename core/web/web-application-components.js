@@ -6,8 +6,6 @@ const { InvalidOperationError } = require('../error');
  */
 class WebApplicationComponents {
   /**
-   * @typedef {import('./controller')} Controller
-   *
    * @param {Controller[]} controllers Application controllers.
    * @param {Function} errorHandler Error handling middleware.
    */
@@ -34,3 +32,6 @@ class WebApplicationComponents {
 }
 
 module.exports = WebApplicationComponents;
+/**
+ * @typedef {import('./controller')} Controller
+ */
