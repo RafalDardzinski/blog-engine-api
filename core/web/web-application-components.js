@@ -16,6 +16,10 @@ class WebApplicationComponents {
 
   /**
    * Check if WebApplicationComponents instance contains valid properties.
+   * @throws {InvalidOperationError} WebApplicationComponents#controllers must be non-empty array
+   *  of instances of Controller class.
+   * @throws {InvalidOperationError} If defined, WebApplicationComponents#errorHandler
+   *  must be a function.
    */
   validateSelf() {
     const { controllers, errorHandler } = this;
@@ -34,4 +38,5 @@ class WebApplicationComponents {
 module.exports = WebApplicationComponents;
 /**
  * @typedef {import('./controller')} Controller
+ * @typedef {import('../error/invalid-operation')} InvalidOperationError
  */

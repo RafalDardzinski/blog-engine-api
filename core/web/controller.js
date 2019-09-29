@@ -38,6 +38,8 @@ class Controller {
 
   /**
    * Checks if Controller contains valid properties.
+   * @throws {InvalidOperationError} Controller#routes must be non-empty array.
+   * @throws {InvalidOperationError} Controller#routes must only contain instances of Route class.
    */
   validateSelf() {
     if (!this.hasRoutes) {
@@ -54,4 +56,5 @@ class Controller {
 module.exports = Controller;
 /**
  * @typedef {import('./route')} Route
+ * @typedef {import('../error/invalid-operation')} InvalidOperationError
  */
