@@ -3,10 +3,6 @@
  */
 class ApplicationBuilder {
   /**
-   * @typedef {import('./web-application-build-strategy')} WebApplicationBuildStrategy
-   * @typedef {import('./web-application-components')} WebApplicationComponents
-   * @typedef {import('./controller')} Controller
-   *
    * @param {Function} appFactory Factory function that returns top level request handlers.
    * @param {Function} routerFactory Factory function that returns routers.
    * @param {WebApplicationBuildStrategy} buildStrategy Strategy used to apply default components.
@@ -58,3 +54,8 @@ class ApplicationBuilder {
 }
 
 module.exports = ApplicationBuilder;
+/**
+ * @typedef {import('./web-application-build-strategy')} WebApplicationBuildStrategy
+ * @typedef {import('./web-application-components')} WebApplicationComponents
+ * @typedef {import('./controller')} Controller
+ */

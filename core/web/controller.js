@@ -7,8 +7,6 @@ const { InvalidOperationError } = require('../error');
  */
 class Controller {
   /**
-   * @typedef {import('./route')} Route
-   *
    * @param {String} mountPath Base path of the controller.
    */
   constructor(mountPath) {
@@ -54,3 +52,6 @@ class Controller {
 }
 
 module.exports = Controller;
+/**
+ * @typedef {import('./route')} Route
+ */

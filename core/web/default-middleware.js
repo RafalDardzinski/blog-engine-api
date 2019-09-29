@@ -2,10 +2,17 @@ const morgan = require('morgan');
 const bodyParser = require('body-parser');
 
 /**
- * TODO: Configure morgan to use regular logger.
- * TODO: TODO: Add additional middleware.
+ * Default middleware to inject to server request handler.
+ * @param {Logger} logger Logger adapter.
  */
-module.exports = () => [
-  morgan('dev'),
+const defaultMiddleware = logger => [
+  morgan('dev', {
+    stream: logger.stream,
+  }),
   bodyParser.json(),
 ];
+
+module.exports = defaultMiddleware;
+/**
+ * @typedef {import('../logger/logger')} Logger
+ */
