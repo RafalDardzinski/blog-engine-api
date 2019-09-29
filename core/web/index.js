@@ -4,7 +4,7 @@ const express = require('express');
 // External modules imports
 const { LoggerFactory } = require('../logger');
 
-// Module imports
+// Local imports
 const ApplicationComponents = require('./web-application-components');
 const Controller = require('./controller');
 const Route = require('./route');
