@@ -23,6 +23,16 @@ const createProcessEnvMock = (key = 'TEST', config = createConfigMock()) => {
 };
 
 describe(`DatabaseConfiguration ${__dirname}/database`, () => {
+  describe('constructor(key)', () => {
+    describe('when key is falsy', () => {
+      it('throws InvalidOperationError', () => {
+        const act = () => new DatabaseConfiguration();
+
+        expect(act).to.throw(InvalidOperationError);
+      });
+    });
+  });
+
   describe('DatabaseConfiguration#dbConfigKey', () => {
     const key = 'TEST';
     let databaseConfiguration;

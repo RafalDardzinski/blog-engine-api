@@ -10,14 +10,17 @@ class DatabaseConfiguration {
    * @param {string} key Key used to identify config related to particular database in .env file.
    */
   constructor(key) {
+    if (!key) {
+      throw new InvalidOperationError('Key for database configuration cannot be null!');
+    }
     _key.set(this, key);
   }
 
   /**
    * Database URI, value depends on information in .env file.
-   * @returns {string} Database URI.
+   * @returns {String} Database URI.
    * @throws {InvalidOperationError} Both HOST and DATABASE must be specified.
-   * @throws {InvalidOperationError} USERNAME and PASSWORD must be defined both
+   * @throws {InvalidOperationError} USERNAME and PASSWORD must be defined
    * or both must not be defined at all
    */
   getUri() {
