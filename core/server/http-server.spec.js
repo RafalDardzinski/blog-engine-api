@@ -1,11 +1,13 @@
 const chai = require('chai');
 const http = require('http');
 const spies = require('chai-spies');
+const chaiAsPromised = require('chai-as-promised');
 const HttpServer = require('./http-server');
 const { InvalidOperationError } = require('../error');
 
 const { expect } = chai;
 chai.use(spies);
+chai.use(chaiAsPromised);
 
 const createObserverMock = () => ({
   watch: () => null,
@@ -35,9 +37,9 @@ describe(`HttpServer ${__dirname}/http-server.js`, () => {
   });
 
   describe('HttpServer#start(webApp)', () => {
-    it('assigns an instance of http.Server to HttpServer#instance', () => {
+    it('assigns an instance of http.Server to HttpServer#instance', async () => {
       // Arrange + Act
-      server.start();
+      await server.start();
 
       // Assert
       expect(server.instance).to.be.an.instanceOf(http.Server);
@@ -46,9 +48,9 @@ describe(`HttpServer ${__dirname}/http-server.js`, () => {
       server.instance.close();
     });
 
-    it('starts the HttpServer#instance', () => {
+    it('starts the HttpServer#instance', async () => {
       // Arrange + Act
-      server.start();
+      await server.start();
 
       // Assert
       expect(server.instance.listening).to.equal(true);
@@ -57,9 +59,9 @@ describe(`HttpServer ${__dirname}/http-server.js`, () => {
       server.instance.close();
     });
 
-    it('sets HttpServer#instance to listen on port defined in HttpServer#config.port', () => {
+    it('sets HttpServer#instance to listen on port defined in HttpServer#config.port', async () => {
       // Arrange + Act
-      server.start();
+      await server.start();
 
       // Assert
       expect(server.instance.address().port).to.equal(configMock.port);

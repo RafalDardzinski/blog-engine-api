@@ -23,8 +23,15 @@ class HttpServer {
     const { port } = this.config;
     this.instance = http.createServer(webApp);
     const { instance, observer } = this;
-    if (observer) observer.watch(instance);
-    this.instance.listen(port);
+
+    if (observer) {
+      observer.watch(instance);
+    }
+
+    return new Promise((resolve, reject) => {
+      this.instance.listen(port, resolve)
+        .on('error', reject);
+    });
   }
 
   /**
