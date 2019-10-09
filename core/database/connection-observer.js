@@ -36,6 +36,7 @@ class DatabaseConnectionObserver {
 
   onError(err) {
     this.logger.error(err.message);
+    throw err;
   }
 
   onReconnecting() {

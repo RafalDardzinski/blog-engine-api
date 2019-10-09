@@ -49,7 +49,7 @@ class DatabaseConnectionManager {
    * Closes the connection to the database.
    */
   disconnect() {
-    _connection.get(this).close();
+    return _connection.get(this).close();
   }
 
   /**
