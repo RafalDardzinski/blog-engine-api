@@ -1,4 +1,7 @@
-// TODO: replace logger with app watcher or something...
+// TODO: Replace logger with events and observer pattern.
+const { LoggerFactory } = require('../logger');
+const { Ensure } = require('../utility');
+
 const _webApplication = new WeakMap();
 const _databaseConnectionManager = new WeakMap();
 const _logger = new WeakMap();
@@ -7,10 +10,12 @@ const _logger = new WeakMap();
  * Represents fully built application.
  */
 class Application {
-  constructor(webApplication, databaseConnectionManager, logger) {
+  constructor(webApplication, databaseConnectionManager) {
+    Ensure.isDefined(webApplication, 'webApplication');
+    Ensure.isDefined(databaseConnectionManager, 'databaseConnectionManager');
     _webApplication.set(this, webApplication);
     _databaseConnectionManager.set(this, databaseConnectionManager);
-    _logger.set(this, logger);
+    _logger.set(this, LoggerFactory.create());
   }
 
   /**
@@ -37,7 +42,7 @@ class Application {
       await server.start(webApplication);
       logger.info(`${this.name} started...`);
     } catch (error) {
-      // TODO: add global error handler.
+      // TODO: emit error event
       if (databaseConnectionManager.isConnected) {
         await databaseConnectionManager.disconnect();
       }

@@ -7,11 +7,11 @@ const chaiAsPromised = require('chai-as-promised');
 const Application = require('./application');
 
 // Mocks
-class WebApplication {
+class WebApplicationMock {
 
 }
 
-class DatabaseConnectionManager {
+class DatabaseConnectionManagerMock {
   connect() {
     return Promise.resolve();
   }
@@ -21,13 +21,7 @@ class DatabaseConnectionManager {
   }
 }
 
-class Logger {
-  info() {}
-
-  error() {}
-}
-
-class Server {
+class ServerMock {
   start() {
     return Promise.resolve();
   }
@@ -42,23 +36,21 @@ const { expect } = chai;
 describe(`Application ${__dirname}`, () => {
   let webApplication;
   let databaseConnectionManager;
-  let logger;
   let server;
   let unitUnderTest;
 
   beforeEach(() => {
-    webApplication = new WebApplication();
-    databaseConnectionManager = new DatabaseConnectionManager();
-    logger = new Logger();
-    server = new Server();
-    unitUnderTest = new Application(webApplication, databaseConnectionManager, logger);
+    webApplication = new WebApplicationMock();
+    databaseConnectionManager = new DatabaseConnectionManagerMock();
+    server = new ServerMock();
+    unitUnderTest = new Application(webApplication, databaseConnectionManager);
   });
 
   afterEach(() => {
     sandbox.restore();
   });
 
-  describe('constructor(webApplication, databaseConnectionManager, logger)', () => {
+  describe('constructor(webApplication, databaseConnectionManager)', () => {
     it('does not reveal webApplication', () => {
       // Act
       const publicProps = Object.values(unitUnderTest);
@@ -75,12 +67,24 @@ describe(`Application ${__dirname}`, () => {
       expect(publicProps).to.not.include(databaseConnectionManager);
     });
 
-    it('does not reveal logger', () => {
-      // Act
-      const publicProps = Object.values(unitUnderTest);
+    describe('when webApplication is undefined...', () => {
+      it('throws an error', () => {
+        // Act
+        const act = () => new Application(undefined, {});
 
-      // Assert
-      expect(publicProps).to.not.include(logger);
+        // Assert
+        expect(act).to.throw();
+      });
+    });
+
+    describe('when databaseConnectionManager is undefined...', () => {
+      it('throws an error', () => {
+        // Act
+        const act = () => new Application({}, undefined);
+
+        // Assert
+        expect(act).to.throw();
+      });
     });
   });
 
@@ -124,22 +128,6 @@ describe(`Application ${__dirname}`, () => {
     });
 
     describe('when connecting to the database fails...', () => {
-      it('logs an error from databaseConnectionManager', async () => {
-        // Arrange
-        sandbox.on(logger, 'error');
-        const connectionError = new Error('connection failed');
-        databaseConnectionManager.connect = () => Promise.reject(connectionError);
-
-        // Act
-        try {
-          await unitUnderTest.run(server);
-        } catch (error) {} // eslint-disable-line    
-
-        // Assert
-        expect(logger.error).to.have.been.called
-          .with(connectionError.message);
-      });
-
       it('throws an error from databaseConnectionManager', async () => {
         // Arrange
         const connectionError = new Error('connection failed');
