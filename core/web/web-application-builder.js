@@ -15,14 +15,13 @@ class WebApplicationBuilder {
 
   /**
    * Builds requests handler.
-   * @param {WebApplicationComponents} components Components to build application from.
+   * @param {ApplicationModulesManager} modulesManager Modules to build application from.
    * @returns {Function} Http server request handler function.
    */
-  build(components) {
-    components.validateSelf();
+  build(modulesManager) {
     const app = this.appFactory();
     this.buildStrategy.applyDefaultMiddleware(app);
-    this.registerControllers(app, components.controllers);
+    this.registerControllers(app, modulesManager.controllers);
     return app;
   }
 
@@ -58,6 +57,6 @@ class WebApplicationBuilder {
 module.exports = WebApplicationBuilder;
 /**
  * @typedef {import('./web-application-build-strategy')} WebApplicationBuildStrategy
- * @typedef {import('./web-application-components')} WebApplicationComponents
+ * @typedef {import('../application/modules-manager')} ApplicationModulesManager
  * @typedef {import('./controller')} Controller
  */
