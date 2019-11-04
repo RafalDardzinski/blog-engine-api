@@ -6,13 +6,13 @@ const spies = require('chai-spies');
 const ApplicationModule = require('./module');
 
 // Mocks
-class Repository {
+class RepositoryMock {
   registerConnection() {}
 }
 
-class Service {}
+class ServiceMock {}
 
-class Controller {}
+class ControllerMock {}
 
 // Test suite setup
 chai.use(spies);
@@ -23,12 +23,14 @@ describe(`ApplicationModule ${__dirname}`, () => {
   let repository;
   let service;
   let controller;
+
+  /** @type {ApplicationModule} */
   let unitUnderTest;
 
   beforeEach(() => {
-    repository = new Repository();
-    service = new Service();
-    controller = new Controller();
+    repository = new RepositoryMock();
+    service = new ServiceMock();
+    controller = new ControllerMock();
     unitUnderTest = new ApplicationModule(repository, service, controller);
   });
 
@@ -77,6 +79,45 @@ describe(`ApplicationModule ${__dirname}`, () => {
 
       // Assert
       expect(unitUnderTest.controller).to.equal(controller);
+    });
+  });
+
+  describe('ApplicationModule#isInitialized', () => {
+    it('is readonly', () => {
+      // Arrange
+      const oldValue = unitUnderTest.isInitialized;
+
+      // Act
+      unitUnderTest.isInitialized = 'test';
+
+      // Assert
+      expect(unitUnderTest.isInitialized).equals(oldValue);
+    });
+
+    describe('when repository is initialized...', () => {
+      it('returns true', () => {
+        // Arrange
+        repository.isInitialized = true;
+
+        // Act
+        const result = unitUnderTest.isInitialized;
+
+        // Assert
+        expect(result).to.equal(true);
+      });
+    });
+
+    describe('when repository is not initialized...', () => {
+      it('returns false', () => {
+        // Arrange
+        repository.isInitialized = false;
+
+        // Act
+        const result = unitUnderTest.isInitialized;
+
+        // Assert
+        expect(result).to.equal(false);
+      });
     });
   });
 

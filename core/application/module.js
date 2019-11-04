@@ -18,6 +18,8 @@ class ApplicationModule {
   }
 
   /**
+   * Gets module's service.
+   * @readonly
    * @returns {Service} Service.
    */
   get service() {
@@ -25,10 +27,21 @@ class ApplicationModule {
   }
 
   /**
+   * Gets module's controller.
+   * @readonly
    * @returns {Controller} Controller.
    */
   get controller() {
     return _controller.get(this);
+  }
+
+  /**
+   * Gets information whether module's repository is initialized.
+   * @readonly
+   * @returns {Boolean} Information if module is initialized.
+   */
+  get isInitialized() {
+    return _repository.get(this).isInitialized;
   }
 
   /**
