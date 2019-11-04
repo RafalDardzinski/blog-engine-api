@@ -5,7 +5,6 @@ const express = require('express');
 const { LoggerFactory } = require('../logger');
 
 // Local imports
-const ApplicationComponents = require('./web-application-components');
 const Controller = require('./controller');
 const Route = require('./route');
 const WebApplicationBuilder = require('./web-application-builder');
@@ -27,7 +26,6 @@ class ExpressWebApplicationBuilderFactory {
 }
 
 module.exports = {
-  ApplicationComponents,
   Controller,
   ExpressWebApplicationBuilderFactory,
   Route,

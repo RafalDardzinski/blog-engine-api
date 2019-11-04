@@ -9,4 +9,5 @@ const HTTP_METHODS = {
   DELETE: 'delete',
 };
 
-module.exports = Object.freeze(HTTP_METHODS);
+Object.freeze(HTTP_METHODS);
+module.exports = HTTP_METHODS;

@@ -5,7 +5,6 @@ const spies = require('chai-spies');
 // Local imports
 const WebApplicationBuilder = require('./web-application-builder');
 const WebApplicationBuildStrategy = require('./web-application-build-strategy');
-const WebApplicationComponents = require('./web-application-components');
 const Controller = require('./controller');
 const Route = require('./route');
 const { HTTP_METHODS } = require('../generics');
@@ -43,9 +42,10 @@ class ControllerMock extends Controller {
   }
 }
 
-class ComponentsMock extends WebApplicationComponents {
-  validateSelf() {
-    return true;
+// TODO: fix ut
+class ModulesManagerMock {
+  constructor() {
+    this.controllers = [];
   }
 }
 
@@ -70,7 +70,7 @@ describe(`WebApplicationBuilder ${__dirname}`, () => {
   let router;
   let webApplicationBuildStrategy;
   let controller;
-  let components;
+  let modulesManager;
   let unitUnderTest;
 
   const appFactory = () => webApp;
@@ -81,7 +81,7 @@ describe(`WebApplicationBuilder ${__dirname}`, () => {
     router = RouterMock.create();
     webApplicationBuildStrategy = new WebApplicationBuildStrategy([]);
     controller = new ControllerMock();
-    components = new ComponentsMock([controller], () => null);
+    modulesManager = new ModulesManagerMock();
     unitUnderTest = new WebApplicationBuilder(
       appFactory, routerFactory, webApplicationBuildStrategy,
     );
@@ -108,24 +108,13 @@ describe(`WebApplicationBuilder ${__dirname}`, () => {
     });
   });
 
-  describe('WebApplicationBuilder#build(components)', () => {
-    it('validates components', () => {
-      // Arrange
-      components.validateSelf = chai.spy(() => true);
-
-      // Act
-      unitUnderTest.build(components);
-
-      // Assert
-      expect(components.validateSelf).to.have.been.called();
-    });
-
+  describe('WebApplicationBuilder#build(modulesManager)', () => {
     it('creates web app using WebApplicationBuilder#appFactory()', () => {
       // Arrange
       sandbox.on(unitUnderTest, 'appFactory');
 
       // Act
-      unitUnderTest.build(components);
+      unitUnderTest.build(modulesManager);
 
       // Assert
       expect(unitUnderTest.appFactory).to.have.been.called();
@@ -136,7 +125,7 @@ describe(`WebApplicationBuilder ${__dirname}`, () => {
       sandbox.on(webApplicationBuildStrategy, 'applyDefaultMiddleware');
 
       // Act
-      unitUnderTest.build(components);
+      unitUnderTest.build(modulesManager);
 
       // Assert
       expect(webApplicationBuildStrategy.applyDefaultMiddleware).to.have.been.called
@@ -148,16 +137,16 @@ describe(`WebApplicationBuilder ${__dirname}`, () => {
       sandbox.on(unitUnderTest, 'registerControllers');
 
       // Act
-      unitUnderTest.build(components);
+      unitUnderTest.build(modulesManager);
 
       // Assert
       expect(unitUnderTest.registerControllers).to.have.been.called
-        .with.exactly(webApp, components.controllers);
+        .with.exactly(webApp, modulesManager.controllers);
     });
 
     it('returns web app', () => {
       // Act
-      const result = unitUnderTest.build(components);
+      const result = unitUnderTest.build(modulesManager);
 
       // Assert
       expect(result).to.equal(webApp);

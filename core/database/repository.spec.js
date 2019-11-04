@@ -10,7 +10,7 @@ class ModelMock {
   registerSelf() {}
 }
 
-class ConnectionManagerMock {
+class DatabaseConnectionManagerMock {
   registerModel() {}
 }
 
@@ -22,10 +22,14 @@ const { expect } = chai;
 describe(`Repository ${__dirname}`, () => {
   let model;
   let concreteRepositoryModelProperty;
+  let databaseConnectionManager;
+
+  /** @type {Repository} */
   let unitUnderTest;
 
   beforeEach(() => {
     model = new ModelMock();
+    databaseConnectionManager = new DatabaseConnectionManagerMock();
     concreteRepositoryModelProperty = new WeakMap();
     unitUnderTest = new Repository(model, concreteRepositoryModelProperty);
   });
@@ -69,18 +73,47 @@ describe(`Repository ${__dirname}`, () => {
     });
   });
 
+  describe('Repository#isInitialized', () => {
+    it('is read only', () => {
+      // Arrange
+      const oldValue = unitUnderTest.isInitialized;
+
+      // Act
+      unitUnderTest.isInitialized = 'test';
+
+      // Assert
+      expect(unitUnderTest.isInitialized).to.equal(oldValue);
+    });
+
+    describe('when repository is initialized...', () => {
+      it('returns true', () => {
+        // Act
+        unitUnderTest.registerConnection(databaseConnectionManager);
+
+        // Assert
+        expect(unitUnderTest.isInitialized).to.equal(true);
+      });
+    });
+
+    describe('when repository is not initialized', () => {
+      it('returns false', () => {
+        // Assert
+        expect(unitUnderTest.isInitialized).to.equal(false);
+      });
+    });
+  });
+
   describe('Repository#registerConnection(connectionManager)', () => {
     it('registers model on connection', () => {
       // Arrange
       sandbox.on(model, 'registerSelf');
-      const connectionManager = new ConnectionManagerMock();
 
       // Act
-      unitUnderTest.registerConnection(connectionManager);
+      unitUnderTest.registerConnection(databaseConnectionManager);
 
       // Assert
       expect(model.registerSelf).to.have.been.called
-        .with(connectionManager);
+        .with(databaseConnectionManager);
     });
   });
 });

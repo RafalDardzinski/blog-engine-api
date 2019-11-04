@@ -4,6 +4,8 @@ const spies = require('chai-spies');
 
 // Local imports
 const DatabaseConnectionManager = require('./connection-manager');
+const Model = require('./model');
+const { InvalidOperationError } = require('../error');
 
 // Mocks
 class ConnectionMock {
@@ -13,6 +15,13 @@ class ConnectionMock {
 
   openUri() {
     return Promise.resolve();
+  }
+
+  close() {
+    return Promise.resolve();
+  }
+
+  model() {
   }
 }
 
@@ -152,6 +161,47 @@ describe(`DatabaseConnectionManager ${__dirname}`, () => {
         // Assert
         expect(connection.openUri).to.have.been.called
           .with(uri, defaultOptions);
+      });
+    });
+
+    describe('DatabaseConnectionManager#disconnect', () => {
+      it('disconnects from the database', async () => {
+        // Arrange
+        sandbox.on(connection, 'close');
+
+        // Act
+        await unitUnderTest.disconnect();
+
+        // Assert
+        expect(connection.close).to.have.been.called();
+      });
+    });
+
+    describe('DatabaseConnectionManager#registerModel(model)', () => {
+      it('registers model on connection', () => {
+        // Arrange
+        const model = new Model('test', {});
+        sandbox.on(connection, 'model');
+
+        // Act
+        unitUnderTest.registerModel(model);
+
+        // Assert
+        expect(connection.model).to.have.been.called
+          .with.exactly(model.name, model.schema);
+      });
+
+      describe('when model is not an instance of Model class', () => {
+        it('throws InvalidOperationError', () => {
+          // Arrange
+          const model = {};
+
+          // Act
+          const act = () => unitUnderTest.registerModel(model);
+
+          // Assert
+          expect(act).to.throw(InvalidOperationError);
+        });
       });
     });
   });
