@@ -14,6 +14,8 @@ const { expect } = chai;
 
 describe(`Controller ${__dirname}`, () => {
   const mountPath = 'testMountPath';
+
+  /** @type {Controller} */
   let unitUnderTest;
 
   beforeEach(() => {

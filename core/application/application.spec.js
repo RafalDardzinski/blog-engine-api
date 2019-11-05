@@ -37,6 +37,8 @@ describe(`Application ${__dirname}`, () => {
   let webApplication;
   let databaseConnectionManager;
   let server;
+
+  /** @type {Application} */
   let unitUnderTest;
 
   beforeEach(() => {

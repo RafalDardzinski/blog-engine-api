@@ -45,6 +45,8 @@ describe(`DatabaseConnectionManager ${__dirname}`, () => {
   let connection;
   let connectionFactoryMethod;
   let connectionObserver;
+
+  /** @type {DatabaseConnectionManager} */
   let unitUnderTest;
 
   beforeEach(() => {

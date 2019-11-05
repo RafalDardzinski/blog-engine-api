@@ -12,6 +12,8 @@ const { expect } = chai;
 describe(`WebApplicationBuildStrategy ${__dirname}`, () => {
   const middleware = () => null;
   const defaultMiddleware = [middleware];
+
+  /** @type {WebApplicationBuildStrategy} */
   let unitUnderTest;
 
   beforeEach(() => {

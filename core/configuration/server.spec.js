@@ -9,8 +9,9 @@ const { InvalidOperationError } = require('../error');
 const { expect } = chai;
 
 describe(`ServerConfiguration ${__dirname}`, () => {
-  const unitUnderTest = ServerConfiguration;
   const originalServerPort = process.env.SERVER_PORT;
+
+  const unitUnderTest = ServerConfiguration;
 
   afterEach(() => {
     process.env.SERVER_PORT = originalServerPort;

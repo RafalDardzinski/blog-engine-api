@@ -20,6 +20,8 @@ describe(`Model ${__dirname}`, () => {
   const name = 'testName';
   const schema = {};
   let connectionManager;
+
+  /** @type {Model} */
   let unitUnderTest;
 
   beforeEach(() => {

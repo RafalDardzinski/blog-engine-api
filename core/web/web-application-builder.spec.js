@@ -71,6 +71,8 @@ describe(`WebApplicationBuilder ${__dirname}`, () => {
   let webApplicationBuildStrategy;
   let controller;
   let modulesManager;
+
+  /** @type {WebApplicationBuilder} */
   let unitUnderTest;
 
   const appFactory = () => webApp;

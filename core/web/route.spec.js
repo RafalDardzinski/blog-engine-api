@@ -16,6 +16,8 @@ describe(`Route ${__dirname}`, () => {
   const method = HTTP_METHODS.GET;
   const path = '/test';
   const handler = async () => null;
+
+  /** @type {Route} */
   let unitUnderTest;
 
   beforeEach(() => {
