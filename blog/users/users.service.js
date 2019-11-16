@@ -62,7 +62,7 @@ class UsersService {
    * @throws {BadRequestError} Both username and newUserInfo must be defined.
    */
   async updateUserByUsername(username, newUserInfo) {
-    if (!username || newUserInfo) {
+    if (!username || !newUserInfo) {
       // TODO: Use ensure utility.
       throw new BadRequestError('Missing user\'s details.');
     }
