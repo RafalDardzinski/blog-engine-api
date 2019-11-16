@@ -6,11 +6,11 @@ class EngineError extends Error {
   /**
    * Base custom error class.
    * @param {String} message Error message.
-   * @param {(String|Number)} code Internal code for an error.
+   * @param {(Number)} httpCode Http code corresponding to this type of error.
    */
-  constructor(message, code) {
+  constructor(message, httpCode) {
     super(message);
-    this.code = code;
+    this.httpCode = httpCode;
   }
 }
 
