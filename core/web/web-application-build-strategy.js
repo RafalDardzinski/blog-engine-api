@@ -1,13 +1,14 @@
 /**
- * Extends WEbApplicationBuilder#build() method with additional steps.
+ * Extends WebApplicationBuilder#build() method with additional steps.
  */
 class WebApplicationBuildStrategy {
   /**
    * @param {Function[]} defaultMiddleware Default middleware to
    *  be appied to web app before controllers.
    */
-  constructor(defaultMiddleware = []) {
+  constructor(defaultMiddleware = [], errorHandlerMiddleware) {
     this.defaultMiddleware = defaultMiddleware;
+    this.errorHandlerMiddleware = errorHandlerMiddleware;
   }
 
   /**
@@ -16,6 +17,14 @@ class WebApplicationBuildStrategy {
    */
   applyDefaultMiddleware(webApp) {
     this.defaultMiddleware.forEach(middleware => webApp.use(middleware));
+  }
+
+  /**
+   * Applies error-handling middleware to web-application.
+   * @param {Function} webApp Top-level server request handler (web application).
+   */
+  applyErrorHandler(webApp) {
+    webApp.use(this.errorHandlerMiddleware);
   }
 }
 
