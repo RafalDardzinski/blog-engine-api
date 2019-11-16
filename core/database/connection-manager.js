@@ -6,6 +6,7 @@ const _connection = new WeakMap();
 
 const defaultOptions = {
   useNewUrlParser: true,
+  useUnifiedTopology: true,
 };
 
 /**
