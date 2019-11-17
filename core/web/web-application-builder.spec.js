@@ -42,7 +42,6 @@ class ControllerMock extends Controller {
   }
 }
 
-// TODO: fix ut
 class ModulesManagerMock {
   constructor() {
     this.controllers = [];
@@ -122,7 +121,7 @@ describe(`WebApplicationBuilder ${__dirname}`, () => {
       expect(unitUnderTest.appFactory).to.have.been.called();
     });
 
-    it('applies default middleware on web app using WebApplicationBuilder#buildStrategy()', () => {
+    it('applies default middleware on web app using WebApplicationBuilder#buildStrategy', () => {
       // Arrange
       sandbox.on(webApplicationBuildStrategy, 'applyDefaultMiddleware');
 
@@ -144,6 +143,18 @@ describe(`WebApplicationBuilder ${__dirname}`, () => {
       // Assert
       expect(unitUnderTest.registerControllers).to.have.been.called
         .with.exactly(webApp, modulesManager.controllers);
+    });
+
+    it('applies error handler on web app using WebApplicationBuilder#buildStrategy', () => {
+      // Arrange
+      sandbox.on(webApplicationBuildStrategy, 'applyErrorHandler');
+
+      // Act
+      unitUnderTest.build(modulesManager);
+
+      // Assert
+      expect(webApplicationBuildStrategy.applyErrorHandler).to.have.been.called
+        .with.exactly(webApp);
     });
 
     it('returns web app', () => {
