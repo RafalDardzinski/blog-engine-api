@@ -1,5 +1,5 @@
 const http = require('http');
-const { InvalidOperationError } = require('../error');
+const { InvalidOperationError } = require('../error/core');
 
 /**
  * Node's HttpServer adapter.

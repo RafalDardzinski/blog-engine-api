@@ -3,7 +3,7 @@ const chai = require('chai');
 
 // Local imports
 const ServerConfiguration = require('./server');
-const { InvalidOperationError } = require('../error');
+const { InvalidOperationError } = require('../error/core');
 
 // Test suite setup
 const { expect } = chai;

@@ -1,5 +1,5 @@
 const Route = require('./route');
-const { InvalidOperationError } = require('../error');
+const { InvalidOperationError } = require('../error/core');
 
 /**
  * Base controller class.
@@ -56,5 +56,5 @@ class Controller {
 module.exports = Controller;
 /**
  * @typedef {import('./route')} Route
- * @typedef {import('../error/invalid-operation')} InvalidOperationError
+ * @typedef {import('../error/core/invalid-operation')} InvalidOperationError
  */

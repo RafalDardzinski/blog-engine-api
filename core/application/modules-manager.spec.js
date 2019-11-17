@@ -3,7 +3,7 @@ const chai = require('chai');
 
 // Local imports
 const ModulesManager = require('./modules-manager');
-const { InvalidOperationError } = require('../error');
+const { InvalidOperationError } = require('../error/core');
 
 // Mocks
 class DatabaseConnectionManagerMock {

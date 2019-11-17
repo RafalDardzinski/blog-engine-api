@@ -3,7 +3,7 @@ const http = require('http');
 const spies = require('chai-spies');
 const chaiAsPromised = require('chai-as-promised');
 const HttpServer = require('./http-server');
-const { InvalidOperationError } = require('../error');
+const { InvalidOperationError } = require('../error/core');
 
 const { expect } = chai;
 chai.use(spies);

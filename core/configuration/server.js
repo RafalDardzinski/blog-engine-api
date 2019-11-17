@@ -1,4 +1,4 @@
-const { InvalidOperationError } = require('../error');
+const { InvalidOperationError } = require('../error/core');
 
 /**
  * Contains information used for configuring Http server.

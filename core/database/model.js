@@ -1,4 +1,4 @@
-const { InvalidOperationError } = require('../error');
+const { InvalidOperationError } = require('../error/core');
 
 const _isRegistered = new WeakMap();
 const _internalModel = new WeakMap();
