@@ -7,15 +7,17 @@ const userModelSchema = new Schema({
   username: {
     type: String,
     required: true,
-    min: [5, 'Username has to be at least 5 characters long.'],
-    max: [50, 'Username cannot be longer than 50 characters.'],
+    minlength: [5, 'Username has to be at least 5 characters long.'],
+    maxlength: [50, 'Username cannot be longer than 50 characters.'],
     unique: true,
     immutable: true,
     index: true,
   },
+  // TODO: add suitable regex for password strength.
   password: {
     type: String,
     required: true,
+    minlength: 5,
   },
   email: {
     type: String,
