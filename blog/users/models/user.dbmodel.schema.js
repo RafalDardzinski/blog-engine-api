@@ -13,7 +13,7 @@ const userModelSchema = new Schema({
     immutable: true,
     index: true,
   },
-  // TODO: add suitable regex for password strength.
+  // TODO: change for sub-document with hash and salt.
   password: {
     type: String,
     required: true,
