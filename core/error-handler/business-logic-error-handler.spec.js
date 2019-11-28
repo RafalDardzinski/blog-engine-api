@@ -22,7 +22,7 @@ describe(`BusinessLogicErrorHandler ${__dirname}`, () => {
   let unitUnderTest;
   beforeEach(() => {
     businessError = new BusinessError(errorMessage, errorHttpCode);
-    unitUnderTest = BusinessLogicErrorHandler;
+    unitUnderTest = new BusinessLogicErrorHandler();
   });
 
   describe('BusinessLogicErrorHandler.canHandle(error)', () => {
