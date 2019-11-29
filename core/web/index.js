@@ -11,7 +11,7 @@ const WebApplicationBuilder = require('./web-application-builder');
 const WebApplicationBuildStrategy = require('./web-application-build-strategy');
 
 const defaultMiddleware = require('./default-middleware')(LoggerFactory.create());
-const { MiddlewareFactory: ErrorHandlerMiddlewareFactory, ErrorHandlerRouter, errorHandlers } = require('../error-handler');
+const { ErrorHandlingMiddlewareFactory } = require('../error-handler');
 
 /**
  * Creates express application builder.
@@ -21,13 +21,11 @@ class ExpressWebApplicationBuilderFactory {
    * @returns {WebApplicationBuilder} Instance of WebApplicationBuilder class.
    */
   static create() {
-    const errorHandlersArray = Object.values(errorHandlers);
-    const errorHandlerRouter = new ErrorHandlerRouter(errorHandlersArray);
     const logger = LoggerFactory.create();
-    const errorHandlerMiddleware = ErrorHandlerMiddlewareFactory.create(errorHandlerRouter, logger);
+    const errorHandlingMiddleware = ErrorHandlingMiddlewareFactory.create(logger);
     const buildStrategy = new WebApplicationBuildStrategy(
       defaultMiddleware,
-      errorHandlerMiddleware,
+      errorHandlingMiddleware,
     );
     return new WebApplicationBuilder(express, express.Router, buildStrategy);
   }

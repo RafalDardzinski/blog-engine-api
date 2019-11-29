@@ -64,12 +64,17 @@ class RouteMock extends Route {
   }
 }
 
+class ErrorHandlingMiddlewareMock {
+  handler() { return true; }
+}
+
 describe(`WebApplicationBuilder ${__dirname}`, () => {
   let webApp;
   let router;
   let webApplicationBuildStrategy;
   let controller;
   let modulesManager;
+  let errorHandlingMiddleware;
 
   /** @type {WebApplicationBuilder} */
   let unitUnderTest;
@@ -80,7 +85,8 @@ describe(`WebApplicationBuilder ${__dirname}`, () => {
   beforeEach(() => {
     webApp = new WebAppMock();
     router = RouterMock.create();
-    webApplicationBuildStrategy = new WebApplicationBuildStrategy([]);
+    errorHandlingMiddleware = new ErrorHandlingMiddlewareMock();
+    webApplicationBuildStrategy = new WebApplicationBuildStrategy([], errorHandlingMiddleware);
     controller = new ControllerMock();
     modulesManager = new ModulesManagerMock();
     unitUnderTest = new WebApplicationBuilder(
