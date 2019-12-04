@@ -1,4 +1,4 @@
-const IErrorHandler = require('./i-error-handler');
+const IErrorHandler = require('./error-handler');
 const BusinessLogicError = require('../error/business-logic/base');
 const Response = require('./response');
 

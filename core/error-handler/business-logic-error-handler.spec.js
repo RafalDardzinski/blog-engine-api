@@ -8,7 +8,7 @@ const Response = require('./response');
 const BusinessLogicError = require('../error/business-logic/base');
 
 // Mocks
-class BusinessError extends BusinessLogicError {}
+class BusinessErrorMock extends BusinessLogicError {}
 
 // Test suite setup
 chai.use(spies);
@@ -21,7 +21,7 @@ describe(`BusinessLogicErrorHandler ${__dirname}`, () => {
   let businessError;
   let unitUnderTest;
   beforeEach(() => {
-    businessError = new BusinessError(errorMessage, errorHttpCode);
+    businessError = new BusinessErrorMock(errorMessage, errorHttpCode);
     unitUnderTest = new BusinessLogicErrorHandler();
   });
 
@@ -75,12 +75,12 @@ describe(`BusinessLogicErrorHandler ${__dirname}`, () => {
       expect(result.message).to.equal(errorMessage);
     });
 
-    it('returns Response that Response#stackTrace equals error.stack', () => {
+    it('returns Response that Response#originalError equals error', () => {
       // Arrange + Act
       const result = unitUnderTest.handle(businessError);
 
       // Assert
-      expect(result.stackTrace).to.equal(businessError.stack);
+      expect(result.originalError).to.equal(businessError);
     });
   });
 });
