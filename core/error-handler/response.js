@@ -1,3 +1,5 @@
+const Joi = require('@hapi/joi');
+
 const _originalError = new WeakMap();
 
 /**
@@ -10,25 +12,16 @@ class Response {
    * @param {Error} originalError Instance of original error that was passed to error handler.
    */
   constructor(httpCode, message, originalError) {
+    Joi.assert(httpCode, Joi.number(), `${httpCode} is not a valid http reponse code.`);
+    Joi.assert(message, Joi.string().not().empty(), 'Error message must be a string.');
+
     this.httpCode = httpCode;
     this.message = message;
     _originalError.set(this, originalError);
   }
 
-  /**
-   * @returns {String} Stack trace of original error that was passed to error handler.
-   */
-  get stackTrace() {
-    const originalError = _originalError.get(this);
-    return originalError.stack;
-  }
-
-  /**
-   * @returns {String} Message of original error that was passed to error handler.
-   */
-  get originalMessage() {
-    const originalError = _originalError.get(this);
-    return originalError.message;
+  get originalError() {
+    return _originalError.get(this);
   }
 }
 
