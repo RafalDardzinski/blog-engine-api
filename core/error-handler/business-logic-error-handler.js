@@ -7,11 +7,17 @@ const Response = require('./response');
  * @implements {IErrorHandler}
  */
 class BusinessLogicErrorHandler extends IErrorHandler {
+  /**
+   * Informs if provided error can be handled by this class.
+   * @param {Error} error Instance of error object.
+   * @returns {Boolean} True if error can be handled.
+   */
   canHandle(error) {
     return error instanceof BusinessLogicError;
   }
 
   /**
+   * Handles the provided error.
    * @param {BusinessLogicError} error Instance of business logic error.
    */
   handle(error) {
