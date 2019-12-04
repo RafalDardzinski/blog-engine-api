@@ -4,7 +4,7 @@
   "description": "Blog Restful API",
   "main": "app.js",
   "scripts": {
-    "test:unit": "mocha \"./{,!(node_modules)/**/}*.spec.js\"",
+    "test:unit": "NODE_ENV=test mocha \"./{,!(node_modules)/**/}*.spec.js\"",
     "start": "node app.js"
   },
   "keywords": [
