@@ -24,10 +24,12 @@ class ErrorHandlingMiddleware {
     const env = process.env.NODE_ENV;
     const logger = _logger.get(this);
     if (env !== ENVIRONMENT_TYPES.TEST) {
+      // TODO: check which message should be printed
       logger.error(error.message);
     }
 
     if (env === ENVIRONMENT_TYPES.DEVELOPMENT) {
+      // TODO: check which message should be printed
       logger.error(error.stack);
     }
 

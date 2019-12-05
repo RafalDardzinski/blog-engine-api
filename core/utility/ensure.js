@@ -1,4 +1,4 @@
-// TODO: add unit tests and documentation.
+/** TODO: replace this with joi asserts */
 const assert = require('assert');
 const { InvalidOperationError } = require('../error/core');
 
