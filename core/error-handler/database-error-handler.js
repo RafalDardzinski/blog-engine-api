@@ -1,22 +1,29 @@
-// TODO: Add UT and review documentation.
-
 const { Error: MongooseError } = require('mongoose');
+
 const Response = require('./response');
+const IErrorHandler = require('./error-handler');
 
 /**
  * Handles errors related to database engine.
+ * @implements {IErrorHandler}
  */
-class DatabaseErrorHandler {
+class DatabaseErrorHandler extends IErrorHandler {
   /**
-   * Checks whether the error can be handled by the class.
+   * Informs if provided error can be handled by this class.
    * @param {Error} error Error object.
    * @returns {Boolean}
    */
-  static canHandle(error) {
+  canHandle(error) {
     return error instanceof MongooseError || error.name === 'MongoError'; // TODO: check with documentation.
   }
 
-  static handle(error) {
+  /**
+   * Handles the provided error.
+   * @param {Error} error Instance of error object.
+   * @returns {Response} Http response to the provided error.
+   */
+  handle(error) {
+    // TODO: Add more general handling of built-in Mongo driver errors e.g. MongoTimeoutError
     switch (true) {
       case error instanceof MongooseError.ValidationError:
         return this.handleValidationError(error);
@@ -34,7 +41,7 @@ class DatabaseErrorHandler {
    * @param {MongooseError.ValidationError} error Cast error thrown by mongoose.
    * @returns {Response} Http response.
    */
-  static handleValidationError(error) {
+  handleValidationError(error) {
     // TODO: expand this implementation.
     let message = 'Validation failed!';
     Object.values(error.errors).forEach((e) => {
@@ -49,7 +56,7 @@ class DatabaseErrorHandler {
    * Handles E11000 error.
    * @param {MongooseError} error Instance of E11000 error.
    */
-  static handleUniqueIndexError(error) {
+  handleUniqueIndexError(error) {
     let message = 'Validation failed!';
     Object.keys(error.keyValue).forEach((prop) => {
       message += ` Provided ${prop} already exists!`;
