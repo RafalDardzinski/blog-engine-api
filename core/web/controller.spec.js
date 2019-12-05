@@ -5,7 +5,7 @@ const spies = require('chai-spies');
 // Local imports
 const Controller = require('./controller');
 const Route = require('./route');
-const { InvalidOperationError } = require('../error');
+const { InvalidOperationError } = require('../error/core');
 
 // Test suite setup
 chai.use(spies);

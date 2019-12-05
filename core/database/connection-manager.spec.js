@@ -5,7 +5,7 @@ const spies = require('chai-spies');
 // Local imports
 const DatabaseConnectionManager = require('./connection-manager');
 const Model = require('./model');
-const { InvalidOperationError } = require('../error');
+const { InvalidOperationError } = require('../error/core');
 
 // Mocks
 class ConnectionMock {

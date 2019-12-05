@@ -1,5 +1,5 @@
 const { HTTP_METHODS } = require('../generics');
-const { InvalidOperationError } = require('../error');
+const { InvalidOperationError } = require('../error/core');
 
 const _handler = new WeakMap();
 

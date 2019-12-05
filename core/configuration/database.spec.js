@@ -1,5 +1,5 @@
 const chai = require('chai');
-const { InvalidOperationError } = require('../error');
+const { InvalidOperationError } = require('../error/core');
 const DatabaseConfiguration = require('./database');
 
 const { expect } = chai;

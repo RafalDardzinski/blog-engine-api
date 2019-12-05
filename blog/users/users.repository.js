@@ -66,7 +66,8 @@ class UsersRepository extends Repository {
     }
 
     Object.assign(user, updatedEntity);
-    return user.save().toObject();
+    await user.save();
+    return user.toObject();
   }
 
   /**

@@ -1,6 +1,9 @@
 const Joi = require('@hapi/joi');
 
-const { ValidationError, InvalidOperationError } = require('../error');
+const {
+  BusinessLogic: { EntityValidationError },
+  Engine: { InvalidOperationError },
+} = require('../error');
 
 const _schema = new WeakMap();
 
@@ -17,7 +20,7 @@ class ValidatedEntity {
     const schema = _schema.get(this);
     const { error } = schema.validate(this);
     if (error) {
-      throw new ValidationError([error], error.message);
+      throw new EntityValidationError(error.message);
     }
   }
 }

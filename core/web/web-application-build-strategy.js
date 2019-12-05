@@ -5,10 +5,12 @@ class WebApplicationBuildStrategy {
   /**
    * @param {Function[]} defaultMiddleware Default middleware to
    *  be appied to web app before controllers.
+   * @param {ErrorHandlingMiddleware} errorHandlerMiddleware Instance of
+   * ErrorHandlingMiddleware class.
    */
-  constructor(defaultMiddleware = [], errorHandlerMiddleware) {
+  constructor(defaultMiddleware = [], errorHandlingMiddleware) {
     this.defaultMiddleware = defaultMiddleware;
-    this.errorHandlerMiddleware = errorHandlerMiddleware;
+    this.errorHandlingMiddleware = errorHandlingMiddleware;
   }
 
   /**
@@ -24,8 +26,14 @@ class WebApplicationBuildStrategy {
    * @param {Function} webApp Top-level server request handler (web application).
    */
   applyErrorHandler(webApp) {
-    webApp.use(this.errorHandlerMiddleware);
+    const { errorHandlingMiddleware } = this;
+    const errorHandlingMiddlewareFunction = errorHandlingMiddleware
+      .handler.bind(errorHandlingMiddleware);
+    webApp.use(errorHandlingMiddlewareFunction);
   }
 }
 
 module.exports = WebApplicationBuildStrategy;
+/**
+ * @typedef {import('../error-handler/error-handling-middleware')} ErrorHandlingMiddleware
+ */

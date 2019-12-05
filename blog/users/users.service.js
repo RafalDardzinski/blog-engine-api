@@ -1,5 +1,7 @@
+const Joi = require('@hapi/joi');
+
 const { UserDto } = require('./models');
-const { NotFoundError, BadRequestError } = require('../../core').Error;
+const { NotFoundError } = require('../../core').Error;
 
 const _usersRepository = new WeakMap();
 
@@ -17,14 +19,9 @@ class UsersService {
   /**
    * Creates a new user.
    * @param {Object} userDetails Data for the user to be created.
-   * @throws {BadRequestError} User details must be provided.
    */
   async createUser(userDetails) {
-    if (!userDetails) {
-      // TODO: use Ensure utility.
-      throw new BadRequestError('Missing user\'s details.');
-    }
-
+    Joi.assert(userDetails, Joi.object().exist(), 'userDetails must be provided and must be an object.');
     const usersRepository = _usersRepository.get(this);
     const createdUser = await usersRepository.create(userDetails);
     return new UserDto(createdUser);
@@ -43,9 +40,11 @@ class UsersService {
   /**
    * Gets user by its username.
    * @param {String} username User's username.
+   * @throws Parameter username must be provided.
    * @throws {NotFoundError} User must exist.
    */
   async getUserByUsername(username) {
+    Joi.assert(username, Joi.string().exist(), 'Username must be provided and must be a string.');
     const usersRepository = _usersRepository.get(this);
     const user = await usersRepository.getOne({ username });
     if (!user) {
@@ -59,13 +58,11 @@ class UsersService {
    * Searches for user by the username and updates its properties.
    * @param {String} username Username of the user to be updated.
    * @param {Object} newUserInfo New values for user's properties.
-   * @throws {BadRequestError} Both username and newUserInfo must be defined.
+   * @throws Both username and newUserInfo must be defined.
    */
   async updateUserByUsername(username, newUserInfo) {
-    if (!username || newUserInfo) {
-      // TODO: Use ensure utility.
-      throw new BadRequestError('Missing user\'s details.');
-    }
+    Joi.assert(username, Joi.string().exist(), 'Username must be provided and must be a string.');
+    Joi.assert(newUserInfo, Joi.object().exist(), 'Data must be provided and must be an object.');
 
     const usersRepository = _usersRepository.get(this);
     const user = await usersRepository.update({ username }, newUserInfo);
@@ -77,6 +74,7 @@ class UsersService {
    * @param {String} username Username of user to be deleted.
    */
   async deleteUser(username) {
+    Joi.assert(username, Joi.string().exist(), 'Username must be provided and must be a string.');
     const usersRepository = _usersRepository.get(this);
     return usersRepository.delete({ username });
   }

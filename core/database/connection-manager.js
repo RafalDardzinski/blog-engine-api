@@ -1,5 +1,5 @@
 const Model = require('./model');
-const { InvalidOperationError } = require('../error');
+const { InvalidOperationError } = require('../error/core');
 
 const _config = new WeakMap();
 const _connection = new WeakMap();

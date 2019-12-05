@@ -4,7 +4,7 @@ const spies = require('chai-spies');
 
 // Local imports
 const Model = require('./model');
-const { InvalidOperationError } = require('../error');
+const { InvalidOperationError } = require('../error/core');
 
 // Mocks
 class ConnectionManagerMock {
