@@ -32,5 +32,5 @@ class ErrorHandlerRouter {
 
 module.exports = ErrorHandlerRouter;
 /**
- * @typedef {import('./i-error-handler')} ErrorHandler
+ * @typedef {import('./error-handler')} ErrorHandler
  */

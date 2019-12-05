@@ -3,11 +3,11 @@ const chai = require('chai');
 
 // Local imports
 const Response = require('./response');
-const IErrorHandler = require('./i-error-handler');
+const IErrorHandler = require('./error-handler');
 const ErrorHandlerRouter = require('./error-handler-router');
 
 // Mocks
-class ErrorHandler extends IErrorHandler {
+class ErrorHandlerMock extends IErrorHandler {
   canHandle() {
     return false;
   }
@@ -24,7 +24,7 @@ describe(`ErrorHandlerRouter ${__dirname}`, () => {
   let unitUnderTest;
 
   beforeEach(() => {
-    errorHandlers = [new ErrorHandler(), new ErrorHandler(), new ErrorHandler()];
+    errorHandlers = [new ErrorHandlerMock(), new ErrorHandlerMock(), new ErrorHandlerMock()];
     unitUnderTest = new ErrorHandlerRouter(errorHandlers);
   });
 
@@ -74,7 +74,7 @@ describe(`ErrorHandlerRouter ${__dirname}`, () => {
 
         // Assert
         expect(result.httpCode).to.equal(500, 'Generic response must have response code of 500.');
-        expect(result.originalMessage).to.equal(error.message, 'Message from original error must be saved.');
+        expect(result.originalError).to.equal(error, 'Original error must be saved.');
         expect(result.message).to.not.equal(error.message, 'Response message must not be the same as original error\'s message.');
       });
     });
