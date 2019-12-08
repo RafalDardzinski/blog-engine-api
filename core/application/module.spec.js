@@ -82,42 +82,20 @@ describe(`ApplicationModule ${__dirname}`, () => {
     });
   });
 
-  describe('ApplicationModule#isInitialized', () => {
-    it('is readonly', () => {
+  describe('ApplicationModule#repository', () => {
+    it('returns repository', () => {
+      expect(unitUnderTest.repository).to.equal(repository);
+    });
+
+    it('cannot be reassigned', () => {
       // Arrange
-      const oldValue = unitUnderTest.isInitialized;
+      const newRepository = {};
 
       // Act
-      unitUnderTest.isInitialized = 'test';
+      unitUnderTest.repository = newRepository;
 
       // Assert
-      expect(unitUnderTest.isInitialized).equals(oldValue);
-    });
-
-    describe('when repository is initialized...', () => {
-      it('returns true', () => {
-        // Arrange
-        repository.isInitialized = true;
-
-        // Act
-        const result = unitUnderTest.isInitialized;
-
-        // Assert
-        expect(result).to.equal(true);
-      });
-    });
-
-    describe('when repository is not initialized...', () => {
-      it('returns false', () => {
-        // Arrange
-        repository.isInitialized = false;
-
-        // Act
-        const result = unitUnderTest.isInitialized;
-
-        // Assert
-        expect(result).to.equal(false);
-      });
+      expect(unitUnderTest.repository).to.equal(repository);
     });
   });
 

@@ -36,12 +36,12 @@ class ApplicationModule {
   }
 
   /**
-   * Gets information whether module's repository is initialized.
+   * Gets module's repository.
    * @readonly
-   * @returns {Boolean} Information if module is initialized.
+   * @returns {Repository} Repository.
    */
-  get isInitialized() {
-    return _repository.get(this).isInitialized;
+  get repository() {
+    return _repository.get(this);
   }
 
   /**
