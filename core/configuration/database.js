@@ -1,3 +1,4 @@
+const Configuration = require('./base');
 const { InvalidOperationError } = require('../error/core');
 
 const _key = new WeakMap();
@@ -5,7 +6,7 @@ const _key = new WeakMap();
 /**
  * Contains information used for configuring connection with a database.
  */
-class DatabaseConfiguration {
+class DatabaseConfiguration extends Configuration {
   /**
    * @param {string} key Key used to identify config related to particular database in .env file.
    */
@@ -13,6 +14,8 @@ class DatabaseConfiguration {
     if (!key) {
       throw new InvalidOperationError('Key for database configuration cannot be null!');
     }
+    const configPrefix = `DB_${key.toUpperCase()}`;
+    super(configPrefix);
     _key.set(this, key);
   }
 
@@ -56,7 +59,7 @@ class DatabaseConfiguration {
    * @readonly
    */
   get host() {
-    return process.env[`${this.dbConfigKey}_HOST`];
+    return this.getValue('HOST');
   }
 
   /**
@@ -65,7 +68,7 @@ class DatabaseConfiguration {
    * @readonly
    */
   get database() {
-    return process.env[`${this.dbConfigKey}_DATABASE`];
+    return this.getValue('DATABASE');
   }
 
   /**
@@ -74,7 +77,7 @@ class DatabaseConfiguration {
    * @readonly
    */
   get username() {
-    return process.env[`${this.dbConfigKey}_USERNAME`];
+    return this.getValue('USERNAME');
   }
 
   /**
@@ -83,7 +86,7 @@ class DatabaseConfiguration {
    * @readonly
    */
   get password() {
-    return process.env[`${this.dbConfigKey}_PASSWORD`];
+    return this.getValue('PASSWORD');
   }
 }
 
