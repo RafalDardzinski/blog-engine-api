@@ -10,6 +10,8 @@ const Model = require('./model');
 const Repository = require('./repository');
 const DatabaseConnectionManager = require('./connection-manager');
 const DatabaseConnectionObserver = require('./connection-observer');
+const SchemaBuilder = require('./schema-builder');
+const SchemaPlugin = require('./schema-plugin');
 
 // Dependancies config
 mongoose.set('useCreateIndex', true);
@@ -32,7 +34,9 @@ class DatabaseConnectionManagerFactory {
 }
 
 module.exports = {
+  DatabaseConnectionManagerFactory,
   Model,
   Repository,
-  DatabaseConnectionManagerFactory,
+  SchemaBuilder,
+  SchemaPlugin,
 };
