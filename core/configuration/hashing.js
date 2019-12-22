@@ -1,4 +1,5 @@
 const Joi = require('@hapi/joi');
+const crypto = require('crypto');
 
 const Configuration = require('./base');
 
@@ -28,6 +29,9 @@ class HashingServiceConfiguration extends Configuration {
   get algorithm() {
     const algorithm = this.getValue('ALGORITHM');
     Joi.assert(algorithm, Joi.string().exist());
+    const availableAlgorithms = crypto.getHashes();
+    Joi.assert(algorithm, Joi.string().valid(...availableAlgorithms));
+
     return algorithm;
   }
 
