@@ -2,7 +2,6 @@ const {
   Database: { Repository },
   Error: { NotFoundError },
 } = require('../../core');
-const { UserCreateEntity, UserUpdateEntity } = require('./models');
 
 const _userModel = new WeakMap();
 
@@ -20,20 +19,25 @@ class UsersRepository extends Repository {
    */
   async getAll() {
     /** @type {Model} */
-    const userModel = _userModel.get(this).query();
-    const users = await userModel.find().select('-password');
-    return users.map(u => u.toObject());
+    const UserModel = _userModel.get(this).query();
+    const users = await UserModel.find().select('-password');
+    return users;
   }
 
   /**
    * Fetches user that meets specified criteria.
    * @param {Object} userInfo User search criteria.
+   * @param {Boolean} [includePassword=false] If true, returns password path.
    */
-  async getOne(userInfo) {
+  async getOne(userInfo, includePassword = false) {
     /** @type {Model} */
-    const userModel = _userModel.get(this).query();
-    const user = await userModel.findOne(userInfo).select('-password');
-    return user ? user.toObject() : undefined;
+    const UserModel = _userModel.get(this).query();
+    const query = UserModel.findOne(userInfo);
+    if (!includePassword) {
+      query.select('-password');
+    }
+
+    return query.exec();
   }
 
   /**
@@ -41,13 +45,11 @@ class UsersRepository extends Repository {
    * @param {Object} userInfo Data to create a user from.
    */
   async create(userInfo) {
-    const userToCreate = new UserCreateEntity(userInfo);
     /** @type {Model} */
-    const userModel = _userModel.get(this).query();
-    const user = await userModel.create(userToCreate);
-    const createdUser = user.toObject();
-    delete createdUser.password;
-    return createdUser;
+    const UserModel = _userModel.get(this).query();
+    const newUser = new UserModel(userInfo);
+    await newUser.setPassword(userInfo.password);
+    return newUser.save();
   }
 
   /**
@@ -57,17 +59,17 @@ class UsersRepository extends Repository {
    * @throws {NotFoundError} User must exist.
    */
   async update(userInfo, newUserInfo) {
-    const updatedEntity = new UserUpdateEntity(newUserInfo);
     /** @type {Model} */
-    const userModel = _userModel.get(this).query();
-    const user = await userModel.findOne(userInfo);
-    if (!user) {
-      throw new NotFoundError('Cannot update user that does not exist.');
+    const userToUpdate = await this.getOne(userInfo);
+
+    if (!userToUpdate) {
+      throw new NotFoundError('Provided user cannot be found.');
     }
 
-    Object.assign(user, updatedEntity);
-    await user.save();
-    return user.toObject();
+    userToUpdate.email = newUserInfo.email || userToUpdate.email;
+    userToUpdate.isActive = newUserInfo.isActive || userToUpdate.isActive;
+
+    return userToUpdate.save();
   }
 
   /**
@@ -76,8 +78,8 @@ class UsersRepository extends Repository {
    */
   async delete(userInfo) {
     /** @type {Model} */
-    const userModel = _userModel.get(this).query();
-    await userModel.deleteOne(userInfo);
+    const UserModel = _userModel.get(this).query();
+    return UserModel.findOneAndDelete(userInfo);
   }
 }
 

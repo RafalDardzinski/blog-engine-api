@@ -1,17 +1,44 @@
 const { DataTransferObject } = require('../../../core').Generics;
 
 /**
- * Used for transferring data between controllers / clients.
+ * Used for transferring data from service to controller.
  */
 class UserDto extends DataTransferObject {
-  constructor({
-    username, email,
-  }) {
-    super();
-    this.username = username;
-    this.email = email;
-    this.removeUndefined();
+  constructor(inputDocument) {
+    super(inputDocument, [
+      'username',
+      'email',
+    ]);
   }
 }
 
-module.exports = UserDto;
+/**
+ * Used for destructuring input for creating users.
+ */
+class UserCreate extends DataTransferObject {
+  constructor(inputDocument) {
+    super(inputDocument, [
+      'username',
+      'password',
+      'email',
+    ]);
+  }
+}
+
+/**
+ * Used for destructuring input for updating users.
+ */
+class UserUpdate extends DataTransferObject {
+  constructor(inputDocument) {
+    super(inputDocument, [
+      'email',
+      'isActive',
+    ]);
+  }
+}
+
+module.exports = {
+  UserDto,
+  UserCreate,
+  UserUpdate,
+};
