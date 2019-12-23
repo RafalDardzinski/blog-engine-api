@@ -1,11 +1,24 @@
-// TODO: Add unit tests + documentation.
+/**
+ * Creates immutable object used to communicate between application layers.
+ * @abstract
+ */
 class DataTransferObject {
-  removeUndefined() {
-    Object.entries(this).forEach(([key, value]) => {
-      if (value === undefined) {
-        delete this[key];
+  /**
+   * @param {Object} requestObject Object to destructure.
+   * @param {String[]} transferObjectProperties Array of property names to build the object from.
+   */
+  constructor(
+    requestObject = {},
+    transferObjectProperties = [],
+  ) {
+    transferObjectProperties.forEach((propertyToSet) => {
+      const requestObjectPropertyValue = requestObject[propertyToSet];
+      if (requestObjectPropertyValue) {
+        this[propertyToSet] = requestObject[propertyToSet];
       }
     });
+
+    Object.freeze(this);
   }
 }
 
