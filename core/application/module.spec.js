@@ -23,6 +23,11 @@ describe(`ApplicationModule ${__dirname}`, () => {
   let repository;
   let service;
   let controller;
+  const permissions = {
+    permission1: 'permission_1',
+    permission2: 'permission_2',
+  };
+  Object.freeze(permissions);
 
   /** @type {ApplicationModule} */
   let unitUnderTest;
@@ -31,21 +36,11 @@ describe(`ApplicationModule ${__dirname}`, () => {
     repository = new RepositoryMock();
     service = new ServiceMock();
     controller = new ControllerMock();
-    unitUnderTest = new ApplicationModule(repository, service, controller);
+    unitUnderTest = new ApplicationModule(repository, service, controller, permissions);
   });
 
   afterEach(() => {
     sandbox.restore();
-  });
-
-  describe('constructor(repository, service, controller)', () => {
-    it('does not reveal repository', () => {
-      // Act
-      const publicProps = Object.keys(unitUnderTest);
-
-      // Assert
-      expect(publicProps).to.not.include(repository);
-    });
   });
 
   describe('ApplicationModule#service', () => {
@@ -84,6 +79,7 @@ describe(`ApplicationModule ${__dirname}`, () => {
 
   describe('ApplicationModule#repository', () => {
     it('returns repository', () => {
+      // Assert
       expect(unitUnderTest.repository).to.equal(repository);
     });
 
@@ -96,6 +92,39 @@ describe(`ApplicationModule ${__dirname}`, () => {
 
       // Assert
       expect(unitUnderTest.repository).to.equal(repository);
+    });
+  });
+
+  describe('ApplicationModule#permissions', () => {
+    it('returns array of permissions that module uses', () => {
+      // Arrange
+      const permissionsList = Object.values(permissions);
+
+      // Assert
+      expect(unitUnderTest.permissions).to.deep.equal(permissionsList);
+    });
+
+    it('cannot be reassigned', () => {
+      // Arrange
+      const originalPermissionsList = Object.values(permissions);
+      const newPermissionsList = ['permission_3'];
+
+      // Act
+      unitUnderTest.permissions = newPermissionsList;
+
+      // Assert
+      expect(unitUnderTest.permissions).to.deep.equal(originalPermissionsList);
+    });
+
+    it('cannot be directly modified', () => {
+      // Arrange
+      const originalPermissionsList = Object.values(permissions);
+
+      // Act
+      unitUnderTest.permissions.push('new_permission');
+
+      // Assert
+      expect(unitUnderTest.permissions).to.deep.equal(originalPermissionsList);
     });
   });
 
