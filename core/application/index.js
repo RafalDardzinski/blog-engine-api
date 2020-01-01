@@ -1,4 +1,5 @@
 const { ExpressWebApplicationBuilderFactory } = require('../web');
+const { permissionsManager } = require('../authorization');
 
 const ApplicationModule = require('./module');
 const ApplicationBuilder = require('./builder');
@@ -8,7 +9,7 @@ const webApplicationBuilder = ExpressWebApplicationBuilderFactory.create();
 
 class ApplicationBuilderFactory {
   static create() {
-    return new ApplicationBuilder(webApplicationBuilder);
+    return new ApplicationBuilder(webApplicationBuilder, permissionsManager);
   }
 }
 

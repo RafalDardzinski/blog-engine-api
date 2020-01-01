@@ -24,15 +24,6 @@ class ApplicationModulesManager {
   }
 
   /**
-   * Gets information whether all modules are initialized.
-   * @returns {Boolean} Information whether all modules are initialized.
-   */
-  get areModulesInitialized() {
-    const modules = Object.values(_modules.get(this));
-    return modules.every(m => m.isInitialized);
-  }
-
-  /**
    * Gets service of a module registered under provided name.
    * @param {String} name Key the module was registered under.
    * @returns {Object} Service instance.
@@ -55,6 +46,17 @@ class ApplicationModulesManager {
     const modules = Object.values(_modules.get(this));
     modules.forEach(m => m.initializeRepository(databaseConnectionManager));
   }
+
+  /**
+   * Registers each modules permissions in provided PermissionsManager.
+   * @param {PermissionsManager} permissionsManager Instance of PermissionsManager.
+   */
+  registerPermissions(permissionsManager) {
+    const modules = Object.values(_modules.get(this));
+    modules.forEach((module) => {
+      permissionsManager.registerPermissions(module.permissions);
+    });
+  }
 }
 
 module.exports = ApplicationModulesManager;
@@ -62,4 +64,5 @@ module.exports = ApplicationModulesManager;
 /**
  * @typedef {import('../web/controller')} Controller
  * @typedef {import('../database/connection-manager')} DatabaseConnectionManager
+ * @typedef {import('../authorization/permissions-manager')} PermissionsManager
  */

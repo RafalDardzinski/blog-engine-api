@@ -1,8 +1,13 @@
 const Application = require('./application');
 
 class ApplicationBuilder {
-  constructor(webApplicationBuilder) {
+  /**
+   * @param {WebApplicationBuilder} webApplicationBuilder Instance of WebApplicationBuilder.
+   * @param {PermissionsManager} permissionsManager Instance of PermissionsManager.
+   */
+  constructor(webApplicationBuilder, permissionsManager) {
     this.webApplicationBuilder = webApplicationBuilder;
+    this.permissionsManager = permissionsManager;
   }
 
   /**
@@ -12,6 +17,9 @@ class ApplicationBuilder {
    * DatabaseConnectionManager.
    */
   build(modulesManager, databaseConnectionManager) {
+    modulesManager.registerPermissions(this.permissionsManager);
+    this.permissionsManager.lock();
+
     modulesManager.initializeModules(databaseConnectionManager);
     const webApp = this.buildWebApplication(modulesManager);
 
@@ -31,4 +39,6 @@ module.exports = ApplicationBuilder;
 /**
  * @typedef {import('./modules-manager')} ApplicationModulesManager
  * @typedef {import('../database/connection-manager')} DatabaseConnectionManager
+ * @typedef {import('../web/web-application-builder')} WebApplicationBuilder
+ * @typedef {import('../authorization/permissions-manager')} PermissionsManager
  */
