@@ -23,6 +23,11 @@ describe(`ApplicationModule ${__dirname}`, () => {
   let repository;
   let service;
   let controller;
+  const permissions = {
+    permission1: 'permission_1',
+    permission2: 'permission_2',
+  };
+  Object.freeze(permissions);
 
   /** @type {ApplicationModule} */
   let unitUnderTest;
@@ -31,21 +36,11 @@ describe(`ApplicationModule ${__dirname}`, () => {
     repository = new RepositoryMock();
     service = new ServiceMock();
     controller = new ControllerMock();
-    unitUnderTest = new ApplicationModule(repository, service, controller);
+    unitUnderTest = new ApplicationModule(repository, service, controller, permissions);
   });
 
   afterEach(() => {
     sandbox.restore();
-  });
-
-  describe('constructor(repository, service, controller)', () => {
-    it('does not reveal repository', () => {
-      // Act
-      const publicProps = Object.keys(unitUnderTest);
-
-      // Assert
-      expect(publicProps).to.not.include(repository);
-    });
   });
 
   describe('ApplicationModule#service', () => {
@@ -82,42 +77,54 @@ describe(`ApplicationModule ${__dirname}`, () => {
     });
   });
 
-  describe('ApplicationModule#isInitialized', () => {
-    it('is readonly', () => {
+  describe('ApplicationModule#repository', () => {
+    it('returns repository', () => {
+      // Assert
+      expect(unitUnderTest.repository).to.equal(repository);
+    });
+
+    it('cannot be reassigned', () => {
       // Arrange
-      const oldValue = unitUnderTest.isInitialized;
+      const newRepository = {};
 
       // Act
-      unitUnderTest.isInitialized = 'test';
+      unitUnderTest.repository = newRepository;
 
       // Assert
-      expect(unitUnderTest.isInitialized).equals(oldValue);
+      expect(unitUnderTest.repository).to.equal(repository);
+    });
+  });
+
+  describe('ApplicationModule#permissions', () => {
+    it('returns array of permissions that module uses', () => {
+      // Arrange
+      const permissionsList = Object.values(permissions);
+
+      // Assert
+      expect(unitUnderTest.permissions).to.deep.equal(permissionsList);
     });
 
-    describe('when repository is initialized...', () => {
-      it('returns true', () => {
-        // Arrange
-        repository.isInitialized = true;
+    it('cannot be reassigned', () => {
+      // Arrange
+      const originalPermissionsList = Object.values(permissions);
+      const newPermissionsList = ['permission_3'];
 
-        // Act
-        const result = unitUnderTest.isInitialized;
+      // Act
+      unitUnderTest.permissions = newPermissionsList;
 
-        // Assert
-        expect(result).to.equal(true);
-      });
+      // Assert
+      expect(unitUnderTest.permissions).to.deep.equal(originalPermissionsList);
     });
 
-    describe('when repository is not initialized...', () => {
-      it('returns false', () => {
-        // Arrange
-        repository.isInitialized = false;
+    it('cannot be directly modified', () => {
+      // Arrange
+      const originalPermissionsList = Object.values(permissions);
 
-        // Act
-        const result = unitUnderTest.isInitialized;
+      // Act
+      unitUnderTest.permissions.push('new_permission');
 
-        // Assert
-        expect(result).to.equal(false);
-      });
+      // Assert
+      expect(unitUnderTest.permissions).to.deep.equal(originalPermissionsList);
     });
   });
 

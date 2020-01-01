@@ -7,15 +7,23 @@ const ApplicationBuilder = require('./builder');
 const Application = require('./application');
 
 // Mocks
-class WebApplicationBuilder {
+class WebApplicationBuilderMock {
   build() {
     return {};
   }
 }
 
-class ModulesManager {
+class ModulesManagerMock {
   initializeModules() {}
+
+  registerPermissions() {}
 }
+
+class PermissionsManagerMock {
+  lock() {}
+}
+
+class DatabaseConnectionManagerMock {}
 
 // Test suite setup
 chai.use(spies);
@@ -26,15 +34,17 @@ describe(`ApplicationBuilder ${__dirname}`, () => {
   let webApplicationBuilder;
   let modulesManager;
   let databaseConnectionManager;
+  let permissionsManager;
 
   /** @type {ApplicationBuilder} */
   let unitUnderTest;
 
   beforeEach(() => {
-    webApplicationBuilder = new WebApplicationBuilder();
-    modulesManager = new ModulesManager();
-    databaseConnectionManager = {};
-    unitUnderTest = new ApplicationBuilder(webApplicationBuilder);
+    webApplicationBuilder = new WebApplicationBuilderMock();
+    permissionsManager = new PermissionsManagerMock();
+    modulesManager = new ModulesManagerMock();
+    databaseConnectionManager = new DatabaseConnectionManagerMock();
+    unitUnderTest = new ApplicationBuilder(webApplicationBuilder, permissionsManager);
   });
 
   afterEach(() => {
@@ -45,6 +55,11 @@ describe(`ApplicationBuilder ${__dirname}`, () => {
     it('assigns webApplicationBuilder to ApplicationBuilder#webApplicationBuilder', () => {
       // Assert
       expect(unitUnderTest.webApplicationBuilder).to.equal(webApplicationBuilder);
+    });
+
+    it('assigns permissionsManager to ApplicationBuilder#permissionsManager', () => {
+      // Assert
+      expect(unitUnderTest.permissionsManager).to.equal(permissionsManager);
     });
   });
 
@@ -75,6 +90,29 @@ describe(`ApplicationBuilder ${__dirname}`, () => {
   });
 
   describe('ApplicationBuilder#build(modulesManager, databaseConnectionManager)', () => {
+    it('registers permissions', () => {
+      // Arrange
+      sandbox.on(modulesManager, 'registerPermissions');
+
+      // Act
+      unitUnderTest.build(modulesManager, databaseConnectionManager);
+
+      // Assert
+      expect(modulesManager.registerPermissions).to.have.been.called()
+        .with.exactly(permissionsManager);
+    });
+
+    it('locks permissionsManager to further modifications', () => {
+      // Arrange
+      sandbox.on(permissionsManager, 'lock');
+
+      // Act
+      unitUnderTest.build(modulesManager, databaseConnectionManager);
+
+      // Assert
+      expect(permissionsManager.lock).to.have.been.called();
+    });
+
     it('initializes modules', () => {
       // Arrange
       sandbox.on(modulesManager, 'initializeModules');

@@ -16,7 +16,8 @@ class HttpServerFactory {
   static create() {
     const logger = LoggerFactory.create();
     const serverObserver = new ServerObserver(logger);
-    return new HttpServer(ServerConfiguration, serverObserver);
+    const config = new ServerConfiguration();
+    return new HttpServer(config, serverObserver);
   }
 }
 

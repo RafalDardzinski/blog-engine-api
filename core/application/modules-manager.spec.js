@@ -3,11 +3,26 @@ const chai = require('chai');
 
 // Local imports
 const ModulesManager = require('./modules-manager');
-const { InvalidOperationError } = require('../error');
+const { InvalidOperationError } = require('../error/core');
 
 // Mocks
 class DatabaseConnectionManagerMock {
   registerModel() {}
+}
+
+class ModuleMock {
+  constructor(repository, service, controller, permissions) {
+    this.repository = repository;
+    this.service = service;
+    this.controller = controller;
+    this.permissions = permissions;
+  }
+
+  initializeRepository() {}
+}
+
+class PermissionsManagerMock {
+  registerPermissions() {}
 }
 
 // Test suite setup
@@ -15,6 +30,8 @@ const { expect } = chai;
 
 describe(`ModulesManager ${__dirname}`, () => {
   let databaseConnectionManager;
+  let module1;
+  let module2;
   let modules;
 
   /** @type {ModulesManager} */
@@ -22,7 +39,9 @@ describe(`ModulesManager ${__dirname}`, () => {
 
   beforeEach(() => {
     databaseConnectionManager = new DatabaseConnectionManagerMock();
-    modules = {};
+    module1 = new ModuleMock({}, {}, {}, {});
+    module2 = new ModuleMock({}, {}, {}, {});
+    modules = { module1, module2 };
     unitUnderTest = new ModulesManager(modules);
   });
 
@@ -49,74 +68,11 @@ describe(`ModulesManager ${__dirname}`, () => {
     });
 
     it('returns array of each modules\' controllers', () => {
-      // Arrange
-      const testModule1 = {
-        controller: {},
-      };
-      const testModule2 = {
-        controller: {},
-      };
-      modules.testModule1 = testModule1;
-      modules.testModule2 = testModule2;
-
       // Act
       const result = unitUnderTest.controllers;
 
       // Assert
-      expect(result).to.include.members([testModule1.controller, testModule2.controller]);
-    });
-  });
-
-  describe('ModulesManager#areModulesInitialized', () => {
-    it('is readonly', () => {
-      // Arrange
-      const oldValue = unitUnderTest.areModulesInitialized;
-
-      // Act
-      unitUnderTest.areModulesInitialized = 'test';
-
-      // Assert
-      expect(unitUnderTest.areModulesInitialized).to.equal(oldValue);
-    });
-
-    describe('when all modules are initialized...', () => {
-      it('returns true', () => {
-        // Arrange
-        const testModule1 = {
-          isInitialized: true,
-        };
-        const testModule2 = {
-          isInitialized: true,
-        };
-        modules.testModule1 = testModule1;
-        modules.testModule2 = testModule2;
-
-        // Act
-        const result = unitUnderTest.areModulesInitialized;
-
-        // Assert
-        expect(result).to.equal(true);
-      });
-    });
-
-    describe('when at least one module is not initialized', () => {
-      it('returns false', () => {
-        // Arrange
-        const testModule1 = {
-          isInitialized: true,
-        };
-        const testModule2 = {
-          isInitialized: false,
-        };
-        modules.testModule1 = testModule1;
-        modules.testModule2 = testModule2;
-
-        // Act
-        const result = unitUnderTest.areModulesInitialized;
-
-        // Assert
-        expect(result).to.equal(false);
-      });
+      expect(result).to.include.members([module1.controller, module2.controller]);
     });
   });
 
@@ -153,24 +109,37 @@ describe(`ModulesManager ${__dirname}`, () => {
   describe('ModulesManager#initializeModules(databaseConnectionManager)', () => {
     it('initializes each module\'s repository with databaseConnectionManager', () => {
       // Arrange
-      const testModule1 = {
-        initializeRepository: chai.spy(() => null),
-      };
-      const testModule2 = {
-        initializeRepository: chai.spy(() => null),
-      };
-      modules.testModule1 = testModule1;
-      modules.testModule2 = testModule2;
-
-      const modulesArray = Object.values(modules);
+      module1.initializeRepository = chai.spy(() => null);
+      module2.initializeRepository = chai.spy(() => null);
+      const modulesList = Object.values(modules);
 
       // Act
       unitUnderTest.initializeModules(databaseConnectionManager);
 
       // Assert
-      modulesArray.forEach((module) => {
+      modulesList.forEach((module) => {
         expect(module.initializeRepository).to.have.been.called
-          .with(databaseConnectionManager);
+          .with.exactly(databaseConnectionManager);
+      });
+    });
+  });
+
+  describe('ModulesManager#registerPermissions(permissionsManager)', () => {
+    it('registers each module\'s permission within provided permissionsManager', () => {
+      // Arrange
+      const permissionsManager = new PermissionsManagerMock();
+      permissionsManager.registerPermissions = chai.spy(() => null);
+      module1.permissions = ['permissions_1', 'permissions_2'];
+      module2.permissions = ['permissions_3', 'permissions_4'];
+      const modulesList = Object.values(modules);
+
+      // Act
+      unitUnderTest.registerPermissions(permissionsManager);
+
+      // Assert
+      modulesList.forEach((module, index) => {
+        expect(permissionsManager.registerPermissions).to.have.been
+          .nth(index + 1).called.with.exactly(module.permissions);
       });
     });
   });

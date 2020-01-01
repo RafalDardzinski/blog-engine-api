@@ -22,6 +22,7 @@ class WebApplicationBuilder {
     const app = this.appFactory();
     this.buildStrategy.applyDefaultMiddleware(app);
     this.registerControllers(app, modulesManager.controllers);
+    this.buildStrategy.applyErrorHandler(app);
     return app;
   }
 

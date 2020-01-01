@@ -42,7 +42,6 @@ class ControllerMock extends Controller {
   }
 }
 
-// TODO: fix ut
 class ModulesManagerMock {
   constructor() {
     this.controllers = [];
@@ -65,12 +64,17 @@ class RouteMock extends Route {
   }
 }
 
+class ErrorHandlingMiddlewareMock {
+  handler() { return true; }
+}
+
 describe(`WebApplicationBuilder ${__dirname}`, () => {
   let webApp;
   let router;
   let webApplicationBuildStrategy;
   let controller;
   let modulesManager;
+  let errorHandlingMiddleware;
 
   /** @type {WebApplicationBuilder} */
   let unitUnderTest;
@@ -81,7 +85,8 @@ describe(`WebApplicationBuilder ${__dirname}`, () => {
   beforeEach(() => {
     webApp = new WebAppMock();
     router = RouterMock.create();
-    webApplicationBuildStrategy = new WebApplicationBuildStrategy([]);
+    errorHandlingMiddleware = new ErrorHandlingMiddlewareMock();
+    webApplicationBuildStrategy = new WebApplicationBuildStrategy([], errorHandlingMiddleware);
     controller = new ControllerMock();
     modulesManager = new ModulesManagerMock();
     unitUnderTest = new WebApplicationBuilder(
@@ -122,7 +127,7 @@ describe(`WebApplicationBuilder ${__dirname}`, () => {
       expect(unitUnderTest.appFactory).to.have.been.called();
     });
 
-    it('applies default middleware on web app using WebApplicationBuilder#buildStrategy()', () => {
+    it('applies default middleware on web app using WebApplicationBuilder#buildStrategy', () => {
       // Arrange
       sandbox.on(webApplicationBuildStrategy, 'applyDefaultMiddleware');
 
@@ -144,6 +149,18 @@ describe(`WebApplicationBuilder ${__dirname}`, () => {
       // Assert
       expect(unitUnderTest.registerControllers).to.have.been.called
         .with.exactly(webApp, modulesManager.controllers);
+    });
+
+    it('applies error handler on web app using WebApplicationBuilder#buildStrategy', () => {
+      // Arrange
+      sandbox.on(webApplicationBuildStrategy, 'applyErrorHandler');
+
+      // Act
+      unitUnderTest.build(modulesManager);
+
+      // Assert
+      expect(webApplicationBuildStrategy.applyErrorHandler).to.have.been.called
+        .with.exactly(webApp);
     });
 
     it('returns web app', () => {

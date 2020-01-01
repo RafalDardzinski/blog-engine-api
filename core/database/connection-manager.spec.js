@@ -5,7 +5,7 @@ const spies = require('chai-spies');
 // Local imports
 const DatabaseConnectionManager = require('./connection-manager');
 const Model = require('./model');
-const { InvalidOperationError } = require('../error');
+const { InvalidOperationError } = require('../error/core');
 
 // Mocks
 class ConnectionMock {
@@ -136,6 +136,7 @@ describe(`DatabaseConnectionManager ${__dirname}`, () => {
       const options = {
         useNewUrlParser: false,
         someProp: true,
+        useUnifiedTopology: false,
       };
       const uri = DatabaseConfigMock.getUri();
       sandbox.on(connection, 'openUri');
@@ -153,6 +154,7 @@ describe(`DatabaseConnectionManager ${__dirname}`, () => {
         // Arrange
         const defaultOptions = {
           useNewUrlParser: true,
+          useUnifiedTopology: true,
         };
         const uri = DatabaseConfigMock.getUri();
         sandbox.on(connection, 'openUri');

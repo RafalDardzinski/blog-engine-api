@@ -1,10 +1,7 @@
-const ValidationError = require('./validation');
-const InvalidOperationError = require('./invalid-operation');
-const MissingImplementationError = require('./missing-implementation');
-
+const BusinessLogic = require('./business-logic');
+const Engine = require('./core');
 
 module.exports = {
-  ValidationError,
-  InvalidOperationError,
-  MissingImplementationError,
+  BusinessLogic,
+  Engine,
 };

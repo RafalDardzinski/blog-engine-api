@@ -3,7 +3,7 @@ const chai = require('chai');
 
 // Local imports
 const ServerConfiguration = require('./server');
-const { InvalidOperationError } = require('../error');
+const { InvalidOperationError } = require('../error/core');
 
 // Test suite setup
 const { expect } = chai;
@@ -11,14 +11,14 @@ const { expect } = chai;
 describe(`ServerConfiguration ${__dirname}`, () => {
   const originalServerPort = process.env.SERVER_PORT;
 
-  const unitUnderTest = ServerConfiguration;
+  const unitUnderTest = new ServerConfiguration();
 
   afterEach(() => {
     process.env.SERVER_PORT = originalServerPort;
   });
 
   describe('ServerConfiguration.port', () => {
-    it('returns value in SERVER_PORT environment variable', () => {
+    it('returns value of SERVER_PORT environment variable', () => {
       // Arrange
       const expectedValue = 4684;
       process.env.SERVER_PORT = expectedValue;
@@ -36,10 +36,10 @@ describe(`ServerConfiguration ${__dirname}`, () => {
       process.env.SERVER_PORT = expectedValue;
 
       // Act
-      ServerConfiguration.port = () => 'incorrect';
+      unitUnderTest.port = () => 'incorrect';
 
       // Assert
-      expect(ServerConfiguration.port).to.equal(expectedValue);
+      expect(unitUnderTest.port).to.equal(expectedValue);
     });
 
     describe('when SERVER_PORT is not defined...', () => {

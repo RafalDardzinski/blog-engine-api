@@ -1,6 +1,7 @@
 const _repository = new WeakMap();
 const _service = new WeakMap();
 const _controller = new WeakMap();
+const _permissions = new WeakMap();
 
 /**
  * Represents module of an application.
@@ -10,11 +11,13 @@ class ApplicationModule {
    * @param {Repository} repository Instance of concrete repository.
    * @param {Service} service Instance of concrete service.
    * @param {Controller} controller Instance of concrete controller.
+   * @param {Object} permissions Set of permissions related to the module.
    */
-  constructor(repository, service, controller) {
+  constructor(repository, service, controller, permissions = {}) {
     _repository.set(this, repository);
     _service.set(this, service);
     _controller.set(this, controller);
+    _permissions.set(this, permissions);
   }
 
   /**
@@ -36,12 +39,22 @@ class ApplicationModule {
   }
 
   /**
-   * Gets information whether module's repository is initialized.
+   * Gets module's repository.
    * @readonly
-   * @returns {Boolean} Information if module is initialized.
+   * @returns {Repository} Repository.
    */
-  get isInitialized() {
-    return _repository.get(this).isInitialized;
+  get repository() {
+    return _repository.get(this);
+  }
+
+  /**
+   * Gets module's permissions.
+   * @readonly
+   * @returns {String[]} Array of permissions.
+   */
+  get permissions() {
+    const permissionsSet = _permissions.get(this);
+    return Object.values(permissionsSet);
   }
 
   /**
