@@ -25,6 +25,8 @@ class MongooseErrorMock extends MongooseError {}
 
 class ValidationErrorMock extends MongooseError.ValidationError {}
 
+class CastErrorMock extends MongooseError.CastError {}
+
 // Test suite setup
 const { expect } = chai;
 
@@ -107,6 +109,21 @@ describe(`DatabaseErrorHandler ${__dirname}`, () => {
       });
     });
 
+    describe('when error is a CastError...', () => {
+      it('returns result from DatabaseErrorHandler#handleCastError(error)', () => {
+        // Arrange
+        const error = new CastErrorMock('test');
+
+        const expectedResponse = unitUnderTest.handleCastError(error);
+
+        // Act
+        const result = unitUnderTest.handle(error);
+
+        // Assert
+        expect(result).to.deep.equal(expectedResponse);
+      });
+    });
+
     describe('when error is not supported...', () => {
       it('returns null', () => {
         // Arrange
@@ -143,6 +160,21 @@ describe(`DatabaseErrorHandler ${__dirname}`, () => {
 
       // Act
       const result = unitUnderTest.handleUniqueIndexError(error);
+
+      // Assert
+      expect(result.httpCode).to.equal(400, 'Http code does not equal 400.');
+      expect(result.message.length).to.be.greaterThan(0, 'Response message is not provided.');
+      expect(result.originalError).to.equal(error, 'Reference to original error does not equal the error passed to the method.');
+    });
+  });
+
+  describe('DatabaseErrorHandler#handleCastError(error)', () => {
+    it('returns a valid reponse', () => {
+      // Arrange
+      const error = new MongooseError('test');
+
+      // Act
+      const result = unitUnderTest.handleCastError(error);
 
       // Assert
       expect(result.httpCode).to.equal(400, 'Http code does not equal 400.');
