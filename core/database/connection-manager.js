@@ -7,7 +7,13 @@ const _connection = new WeakMap();
 const defaultOptions = {
   useNewUrlParser: true,
   useUnifiedTopology: true,
+  useFindAndModify: false,
 };
+
+/*
+  TODO: For now, this is only single-db implementation, needs replica sets and transactions
+  for production. To be added in the future.
+*/
 
 /**
  * Manages connection with a database.

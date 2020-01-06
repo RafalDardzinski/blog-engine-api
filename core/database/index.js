@@ -12,6 +12,7 @@ const DatabaseConnectionManager = require('./connection-manager');
 const DatabaseConnectionObserver = require('./connection-observer');
 const SchemaBuilder = require('./schema-builder');
 const SchemaPlugin = require('./schema-plugin');
+const SchemaPathValidator = require('./schema-path-validator');
 
 // Dependancies config
 mongoose.set('useCreateIndex', true);
@@ -38,5 +39,6 @@ module.exports = {
   Model,
   Repository,
   SchemaBuilder,
+  SchemaPathValidator,
   SchemaPlugin,
 };
