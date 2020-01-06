@@ -13,7 +13,7 @@ class DataTransferObject {
   ) {
     transferObjectProperties.forEach((propertyToSet) => {
       const requestObjectPropertyValue = requestObject[propertyToSet];
-      if (requestObjectPropertyValue) {
+      if (requestObjectPropertyValue !== undefined) {
         this[propertyToSet] = requestObject[propertyToSet];
       }
     });
