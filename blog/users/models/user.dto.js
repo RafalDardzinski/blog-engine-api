@@ -6,6 +6,7 @@ const { DataTransferObject } = require('../../../core').Generics;
 class UserDto extends DataTransferObject {
   constructor(inputDocument) {
     super(inputDocument, [
+      '_id',
       'username',
       'email',
     ]);

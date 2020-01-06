@@ -1,5 +1,5 @@
 const { Model, SchemaBuilder } = require('../../../core').Database;
-const { Hashing: { HashingServiceFactory }} = require('../../../core/services');
+const { Hashing: { HashingServiceFactory } } = require('../../../core/services');
 
 const userDtos = require('./user.dto');
 const PasswordUtiltitiesPlugin = require('./password-utilities.plugin');

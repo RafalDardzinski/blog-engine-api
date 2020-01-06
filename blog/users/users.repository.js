@@ -7,7 +7,7 @@ const _userModel = new WeakMap();
 
 class UsersRepository extends Repository {
   /**
-   * @param {UserModel} userModel
+   * @param {DatabaseModel} userModel Built user database model.
    */
   constructor(userModel) {
     super(userModel, _userModel);
@@ -85,6 +85,6 @@ class UsersRepository extends Repository {
 
 module.exports = UsersRepository;
 /**
- * @typedef {import('../../core/database/model')} UserModel
+ * @typedef {import('../../core/database/model')} DatabaseModel
  * @typedef {import('mongoose').Model} Model
  */
