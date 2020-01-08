@@ -14,14 +14,15 @@ class UsersRepository extends Repository {
   }
 
   /**
-   * Fetches all users from the repository.
-   * TODO: Add pagination.
+   * Creates a new user.
+   * @param {Object} userInfo Data to create a user from.
    */
-  async getAll() {
+  async create(userInfo) {
     /** @type {Model} */
     const UserModel = _userModel.get(this).query();
-    const users = await UserModel.find().select('-password');
-    return users;
+    const newUser = new UserModel(userInfo);
+    await newUser.setPassword(userInfo.password);
+    return newUser.save();
   }
 
   /**
@@ -41,15 +42,14 @@ class UsersRepository extends Repository {
   }
 
   /**
-   * Creates a new user.
-   * @param {Object} userInfo Data to create a user from.
+   * Gets all users from the repository.
+   * TODO: Add pagination.
    */
-  async create(userInfo) {
+  async getAll() {
     /** @type {Model} */
     const UserModel = _userModel.get(this).query();
-    const newUser = new UserModel(userInfo);
-    await newUser.setPassword(userInfo.password);
-    return newUser.save();
+    const users = await UserModel.find().select('-password');
+    return users;
   }
 
   /**
@@ -63,6 +63,7 @@ class UsersRepository extends Repository {
     const userToUpdate = await this.getOne(userInfo);
 
     if (!userToUpdate) {
+      // TODO: move this to service
       throw new NotFoundError('Provided user cannot be found.');
     }
 

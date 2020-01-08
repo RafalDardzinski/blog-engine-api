@@ -19,9 +19,10 @@ class UsersService {
   /**
    * Creates a new user.
    * @param {Object} userDetails Data for the user to be created.
+   * @returns {UserDto} Created user.
    */
   async createUser(userDetails) {
-    Joi.assert(userDetails, Joi.object().exist(), 'userDetails must be provided and must be an object.');
+    Joi.assert(userDetails, Joi.object().exist(), 'Parameter \'userDetails\' must be provided and must be an object.');
 
     const usersRepository = _usersRepository.get(this);
     const userInfo = new UserCreate(userDetails);
@@ -30,7 +31,8 @@ class UsersService {
   }
 
   /**
-   * Gets all users.
+   * Gets list of all users.
+   * @returns {UserDto[]} List of users.
    */
   async getUsers() {
     // TODO: Add pagination.
@@ -42,11 +44,12 @@ class UsersService {
   /**
    * Gets user by its username.
    * @param {String} username User's username.
-   * @throws Parameter username must be provided.
+   * @throws Parameter username must be provided and must be a string.
    * @throws {NotFoundError} User must exist.
    */
   async getUserByUsername(username) {
-    Joi.assert(username, Joi.string().exist(), 'Username must be provided and must be a string.');
+    // TODO: change username to ID.
+    Joi.assert(username, Joi.string().exist(), 'Parameter \'username\' must be provided and must be a string.');
     const usersRepository = _usersRepository.get(this);
     const user = await usersRepository.getOne({ username });
     if (!user) {
@@ -85,9 +88,10 @@ class UsersService {
   /**
    * Searches for user by the username and deletes it.
    * @param {String} username Username of user to be deleted.
+   * @throws Parameter username must be provided and must be a string.
    */
   async deleteUser(username) {
-    Joi.assert(username, Joi.string().exist(), 'Username must be provided and must be a string.');
+    Joi.assert(username, Joi.string().exist(), 'Parameter \'username\' must be provided and must be a string.');
     const usersRepository = _usersRepository.get(this);
     return usersRepository.delete({ username });
   }
@@ -98,19 +102,22 @@ class UsersService {
    * @param {String} newPassword New password.
    * @param {String=} oldPassword User's old password. If not provided, requires additional
    * privileges.
-   * @throws {NotFoundError} User must exist.
-   * @throws {ValidationError} Current password must match provided oldPassword.
-   * @throws {AuthorizationError} If oldPassword is not provided, additional privileges needed.
+   * @throws Parameter username must be provided and must be a string.
+   * @throws Parameter newPassword must be provided and must be a string.
+   * @throws User must exist.
+   * @throws Current password must match provided oldPassword.
+   * @throws If oldPassword is not provided, additional privileges needed.
    */
   async changePassword(username, newPassword, oldPassword) {
-    Joi.assert(username, Joi.string().exist(), 'Username must be provided and must be a string.');
-    Joi.assert(newPassword, Joi.string().exist(), 'New password must be provided and must be a string.');
+    Joi.assert(username, Joi.string().exist(), 'Parameter \'username\' must be provided and must be a string.');
+    Joi.assert(newPassword, Joi.string().exist(), 'Parameter \'newPassword\' must be provided and must be a string.');
 
     if (!oldPassword) {
       // TODO: Provide actual mechanism for checking user privileges.
       throw new AuthorizationError('Specific privileges needed.');
     }
 
+    /** @type {UsersRepository} */
     const usersRepository = _usersRepository.get(this);
     /** @type {MongooseDocument} */
     const user = await usersRepository.getOne({ username }, true);
