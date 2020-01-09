@@ -1,14 +1,10 @@
-const Model = require('./model');
 const { InvalidOperationError } = require('../error/core');
+
+const Model = require('./model');
+const defaultOptions = require('./default-connection-options');
 
 const _config = new WeakMap();
 const _connection = new WeakMap();
-
-const defaultOptions = {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-  useFindAndModify: false,
-};
 
 /*
   TODO: For now, this is only single-db implementation, needs replica sets and transactions
@@ -43,7 +39,7 @@ class DatabaseConnectionManager {
 
   /**
    * Connects to the database.
-   * @param {Object=} options Connection options.
+   * @param {Object=} options Connection options. Can overwrite default options.
    */
   connect(options = {}) {
     const connection = _connection.get(this);
