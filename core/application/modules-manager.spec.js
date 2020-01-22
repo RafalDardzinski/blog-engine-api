@@ -22,7 +22,7 @@ class ModuleMock {
 }
 
 class PermissionsManagerMock {
-  registerPermissions() {}
+  registerPermission() {}
 }
 
 // Test suite setup
@@ -128,18 +128,18 @@ describe(`ModulesManager ${__dirname}`, () => {
     it('registers each module\'s permission within provided permissionsManager', () => {
       // Arrange
       const permissionsManager = new PermissionsManagerMock();
-      permissionsManager.registerPermissions = chai.spy(() => null);
+      permissionsManager.registerPermission = chai.spy(() => null);
       module1.permissions = ['permissions_1', 'permissions_2'];
       module2.permissions = ['permissions_3', 'permissions_4'];
-      const modulesList = Object.values(modules);
+      const permissionsList = [...module1.permissions, ...module2.permissions];
 
       // Act
       unitUnderTest.registerPermissions(permissionsManager);
 
       // Assert
-      modulesList.forEach((module, index) => {
-        expect(permissionsManager.registerPermissions).to.have.been
-          .nth(index + 1).called.with.exactly(module.permissions);
+      permissionsList.forEach((permission, index) => {
+        expect(permissionsManager.registerPermission).to.have.been
+          .nth(index + 1).called.with.exactly(permission);
       });
     });
   });
