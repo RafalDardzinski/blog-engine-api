@@ -1,21 +1,21 @@
 const { Engine: { InvalidOperationError } } = require('../error');
+const Permission = require('./permission');
 
-const _availablePermissions = new WeakMap();
+const _permissionsStorage = new WeakMap();
 const _isLocked = new WeakMap();
 
+function _sortByNameAsc(a, b) {
+  return (a.name < b.name) ? -1 : 1;
+}
+
+/**
+ * Provides utility to manage permissions internal storage.
+ */
 class PermissionsManager {
   constructor() {
-    _availablePermissions.set(this, []);
+    const storage = new Map();
+    _permissionsStorage.set(this, storage);
     _isLocked.set(this, false);
-  }
-
-  /**
-   * Provides list of permission registered within PermissionManager.
-   * @returns {String[]} List of registered permissions.
-   */
-  get availablePermissions() {
-    const registeredPermissions = _availablePermissions.get(this);
-    return Array.from(registeredPermissions);
   }
 
   /**
@@ -26,39 +26,57 @@ class PermissionsManager {
     return _isLocked.get(this);
   }
 
+
   /**
-   * Registers permissions within the application.
-   * @param {String[]} permissions List of permissions to register.
-   * @throws {InvalidOperationError} Each permission must have unique name.
-   * @throws {InvalidOperationError} PermissionsManager must not be locked.
+   * Lists all available permissions.
+   * @returns {Permission[]} List of permissions sorted by Permission#name.
    */
-  registerPermissions(permissions) {
+  getAvailablePermissions() {
+    /** @type {Map<string, Permission>} */
+    const storage = _permissionsStorage.get(this);
+    const permissions = [];
+    storage.forEach(permission => permissions.push(permission));
+    return permissions.sort(_sortByNameAsc);
+  }
+
+  /**
+   * Registers permission within internal storage.
+   * @param {Permission} permission Instance of Permission class to register.
+   * @throws Parameter 'permission' must be an instance of Permission class.
+   * @throws Each permission must have unique name.
+   * @throws PermissionsManager must not be locked.
+   */
+  registerPermission(permission) {
+    if (!(permission instanceof Permission)) {
+      throw new InvalidOperationError('Cannot register object that is not an instance of Permission class.');
+    }
+
     if (this.isLocked) {
       throw new InvalidOperationError('Cannot register new permissions when PermissionsManager is locked.');
     }
 
-    const doPermissionsContainDuplicates = !permissions.every((p, i, a) => a.indexOf(p) === i);
-    if (doPermissionsContainDuplicates) {
-      throw new InvalidOperationError('Cannot register new permissions - provided list of permissions contains duplicate entries.');
+    /** @type {Map<string, Permission>} */
+    const storage = _permissionsStorage.get(this);
+    if (storage.has(permission.name)) {
+      throw new InvalidOperationError(`Cannot register duplicate permissions: ${permission.name} is already registered.`);
     }
 
-    const availablePermissions = _availablePermissions.get(this);
-    permissions.forEach((permission) => {
-      if (availablePermissions.includes(permission)) {
-        throw new InvalidOperationError(`Cannot register duplicate permissions: ${permission} is already registered.`);
-      }
-
-      availablePermissions.push(permission);
-    });
+    storage.set(permission.name, permission);
   }
 
   /**
-   * Checks if provided permission is recognized (registered within)
-   * this instance of PermissionsManager.
-   * @param {String} permission Permission to check.
+   * Gets permission by its name.
+   * @param {String} permissionName Permission's name.
+   * @returns {Permission} Permission mathing provided name if it was registered.
    */
-  isPermissionRegistered(permission) {
-    return _availablePermissions.get(this).includes(permission);
+  getPermission(permissionName) {
+    /** @type {Map<string, Permission>} */
+    const storage = _permissionsStorage.get(this);
+    return storage.get(permissionName);
+  }
+
+  isPermissionRegistered(permissionName) {
+    return !!this.getPermission(permissionName);
   }
 
   /**
@@ -70,3 +88,6 @@ class PermissionsManager {
 }
 
 module.exports = PermissionsManager;
+/**
+ * @typedef {import('../services/hashing/hashing-service')} HashingService
+ */

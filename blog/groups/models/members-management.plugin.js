@@ -28,7 +28,7 @@ function _checkMembersPathPresence(docInstance) {
  */
 function _isUserInGroup(user) {
   _checkMembersPathPresence(this);
-  if (!this.depopulated('members')) {
+  if (this.populated('members')) {
     this.depopulate('members');
   }
 

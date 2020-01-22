@@ -1,6 +1,7 @@
 const {
   Database: { Repository },
 } = require('../../core');
+const { GroupQueryFilter } = require('./models');
 
 const _groupModel = new WeakMap();
 
@@ -35,12 +36,23 @@ class GroupsRepository extends Repository {
 
   /**
    * Gets all groups from the repository.
+   * @param filter {GroupQueryFilter=} Object used for defining query filters.
    * TODO: Add pagination.
    */
-  async getAll() {
+  async getAll(filter = new GroupQueryFilter()) {
     /** @type {Model} */
     const GroupModel = _groupModel.get(this).query();
-    return GroupModel.find({}).populate({ path: 'members', select: '_id' });
+    return GroupModel.find(filter.getFilterObject()).populate({ path: 'members', select: '_id' });
+  }
+
+  /**
+   * Gets groups that member belongs to.
+   * @param {String} memberId Id of a member.
+   */
+  async getByMember(memberId) {
+    /** @type {Model} */
+    const GroupModel = _groupModel.get(this).query();
+    return GroupModel.find({ members: memberId });
   }
 
   /**

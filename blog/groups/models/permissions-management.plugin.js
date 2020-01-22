@@ -3,8 +3,6 @@ const Joi = require('@hapi/joi');
 const { SchemaPlugin } = require('../../../core/database');
 const { Engine: { InvalidOperationError } } = require('../../../core/error');
 
-const _permissionsValidator = new WeakMap();
-
 /**
  * Checks if instance of a group contains 'permissions' path.
  * @param {MongooseDocument} docInstance Instance of a group.
@@ -18,32 +16,40 @@ function _checkPermissionsPathPresence(docInstance) {
  * @param {MongooseDocument} groupEntity Instance of a group.
  */
 function _removeDuplicatePermissions(groupEntity) {
-  const hasDuplicates = groupEntity.permissions
-    .some((permission, index) => groupEntity.permissions.indexOf(permission) !== index);
+  const duplicatedPermissions = groupEntity.permissions.filter((permission, index, permissions) => {
+    const firstOccurenceIndex = permissions.findIndex((p => p.name === permission.name));
+    return index !== firstOccurenceIndex;
+  });
 
-  if (hasDuplicates) {
-    groupEntity.set('permissions', Array.from(new Set(groupEntity.permissions)));
-  }
+  duplicatedPermissions.forEach((duplicatePermission) => {
+    const duplicatePermissionIndex = groupEntity.permissions.indexOf(duplicatePermission);
+    groupEntity.permissions.splice(duplicatePermissionIndex, 1);
+  });
 }
 
 /**
  * Adds permissions to the group.
- * @param {String[]} permissionsToAdd Permissions to add.
+ * @param {String[]} permissionNameToAdd Permissions to add.
  */
-function _addPermissions(permissionsToAdd = []) {
+function _addPermissions(permissionNameToAdd = []) {
   _checkPermissionsPathPresence(this);
-  permissionsToAdd.forEach(p => this.permissions.push(p));
+  permissionNameToAdd.forEach(p => this.permissions.push({ name: p }));
 }
 
 /**
  * Removes permissions from the group.
- * @param {String[]} permissionsToRemove Permissions to remove.
+ * @param {String[]} permissionNamesToRemove Permissions to remove.
  */
-function _removePermissions(permissionsToRemove = []) {
+function _removePermissions(permissionsToRemoveNames = []) {
   _checkPermissionsPathPresence(this);
-  const permissionsInGroup = permissionsToRemove.filter(p => this.permissions.indexOf(p) > -1);
-  permissionsInGroup.forEach((p) => {
-    this.permissions.splice(this.permissions.indexOf(p), 1);
+
+  permissionsToRemoveNames.forEach((permissionToRemoveName) => {
+    const indexInGroupPermissions = this.permissions
+      .findIndex(p => p.name === permissionToRemoveName);
+
+    if (indexInGroupPermissions !== -1) {
+      this.permissions.splice(indexInGroupPermissions, 1);
+    }
   });
 }
 
@@ -51,19 +57,11 @@ function _removePermissions(permissionsToRemove = []) {
  * Provides functionalities for managing group permissions.
  */
 class PermissionsManagementPlugin extends SchemaPlugin {
-  constructor(permissionsValidator) {
-    super();
-    _permissionsValidator.set(this, permissionsValidator);
-  }
-
   /**
    * @param {MongooseSchema} schema Database schema.
    */
   functionality(schema) {
     /** @type {SchemaPathValidator} */
-    const permissionsValidator = _permissionsValidator.get(this);
-    schema.path('permissions').validate(permissionsValidator.getValidationConfig());
-
     schema.post('validate', _removeDuplicatePermissions);
     schema.method('addPermissions', _addPermissions);
     schema.method('removePermissions', _removePermissions);

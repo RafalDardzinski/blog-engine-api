@@ -20,6 +20,7 @@ describe(`PermissionsManager ${__dirname}`, () => {
     unitUnderTest = new PermissionsManager();
   });
 
+  // TODO: Fix UT.
   describe('PermissionsManager#availablePermissions', () => {
     it('returns list of registered permissions', () => {
       // Arrange

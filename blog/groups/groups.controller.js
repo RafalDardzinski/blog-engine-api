@@ -26,7 +26,19 @@ class GroupsController extends Controller {
   }
 
   async getGroups(req, res) {
-    const groups = await this.groupsService.getGroups();
+    let groups;
+    const { userId } = req.query;
+    if (userId) {
+      groups = await this.groupsService.getGroupsByMember(userId);
+    } else {
+      groups = await this.groupsService.getGroups();
+    }
+    res.json(groups);
+  }
+
+  async getGroupsByMember(req, res) {
+    const { userId } = req.body;
+    const groups = await this.groupsService.getGroupsByMember(userId);
     res.json(groups);
   }
 

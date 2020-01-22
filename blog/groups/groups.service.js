@@ -1,7 +1,9 @@
 const Joi = require('@hapi/joi');
 
-const { GroupDto, GroupCreate, GroupUpdate } = require('./models');
 const { BusinessLogic: { NotFoundError } } = require('../../core/error');
+const {
+  GroupDto, GroupCreate, GroupUpdate, GroupQueryFilter,
+} = require('./models');
 
 const _usersRepository = new WeakMap();
 const _groupsRepository = new WeakMap();
@@ -30,19 +32,21 @@ class GroupsService {
   }
 
   /**
-   * Gets list of all groups.
+   * Gets a list of all groups.
+   * @para
    * @returns {GroupDto[]} List of groups.
    */
   async getGroups() {
     // TODO: Add pagination
     /** @type {GroupsRepository} */
     const groupsRepository = _groupsRepository.get(this);
+
     const groups = await groupsRepository.getAll();
     return groups.map(g => new GroupDto(g));
   }
 
   /**
-   * Gets a group by its id.
+   * Gets a group by it's id.
    * @param {string} id Group id.
    * @throws Parameter id must be provided and must be a string.
    * @throws Group must exist.
@@ -59,6 +63,31 @@ class GroupsService {
     }
 
     return new GroupDto(group);
+  }
+
+  /**
+   * Gets a list of all groups that contain provided id in their members path.
+   * @param {String} memberId Id of a member to search for group by.
+   * @throws Parameter 'memberId' must be provided and must be a string.
+   */
+  async getGroupsByMember(memberId) {
+    Joi.assert(memberId, Joi.string().exist(), 'Parameter \'memberId\' must be provided and must be a string.');
+
+    /** @type {UsersRepository} */
+    const usersRepository = _usersRepository.get(this);
+    const user = await usersRepository.getOne({ _id: memberId });
+    if (!user) {
+      throw new NotFoundError(`User with provided id: ${memberId} does not exist.`);
+    }
+
+    const queryFilter = new GroupQueryFilter({
+      membersFilter: memberId,
+    });
+
+    /** @type {GroupsRepository} */
+    const groupsRepository = _groupsRepository.get(this);
+    const groups = await groupsRepository.getAll(queryFilter);
+    return groups.map(g => new GroupDto(g));
   }
 
   /**

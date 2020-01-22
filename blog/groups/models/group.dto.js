@@ -13,6 +13,7 @@ class GroupDto extends DataTransferObject {
     ]);
   }
 }
+
 /**
  * Used for destructuring input for creating groups.
  */
@@ -20,6 +21,7 @@ class GroupCreate extends DataTransferObject {
   constructor(inputDocument) {
     super(inputDocument, [
       'name',
+      'permissions',
     ]);
   }
 }

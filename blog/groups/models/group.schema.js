@@ -1,4 +1,5 @@
 const { Schema } = require('mongoose');
+const { permissionSchema } = require('../../../core/authorization');
 
 /**
  * @implements {MongooseSchema}
@@ -16,7 +17,7 @@ const groupSchema = {
     ref: 'User',
   }],
   permissions: {
-    type: [String],
+    type: [permissionSchema],
     required: true,
     default: [],
   },

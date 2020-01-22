@@ -54,7 +54,7 @@ class ApplicationModulesManager {
   registerPermissions(permissionsManager) {
     const modules = Object.values(_modules.get(this));
     modules.forEach((module) => {
-      permissionsManager.registerPermissions(module.permissions);
+      module.permissions.forEach(p => permissionsManager.registerPermission(p));
     });
   }
 }
