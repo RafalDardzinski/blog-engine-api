@@ -19,24 +19,11 @@ class PermissionsManager {
   }
 
   /**
-   * Informs if this instance of PermissionsManager is locked for modifications.
-   * @returns {Boolean} PermissionsManager's lock status.
+   * Informs if this instance of PermissionsManager is locked.
+   * @returns {Boolean} True if PermissionsManager is locked.
    */
   get isLocked() {
     return _isLocked.get(this);
-  }
-
-
-  /**
-   * Lists all available permissions.
-   * @returns {Permission[]} List of permissions sorted by Permission#name.
-   */
-  getAvailablePermissions() {
-    /** @type {Map<string, Permission>} */
-    const storage = _permissionsStorage.get(this);
-    const permissions = [];
-    storage.forEach(permission => permissions.push(permission));
-    return permissions.sort(_sortByNameAsc);
   }
 
   /**
@@ -65,6 +52,16 @@ class PermissionsManager {
   }
 
   /**
+   * Lists all registered permissions.
+   * @returns {Permission[]} List of permissions sorted by Permission#name.
+   */
+  getRegisteredPermissions() {
+    /** @type {Map<string, Permission>} */
+    const storage = _permissionsStorage.get(this);
+    return Array.from(storage.values()).sort(_sortByNameAsc);
+  }
+
+  /**
    * Gets permission by its name.
    * @param {String} permissionName Permission's name.
    * @returns {Permission} Permission mathing provided name if it was registered.
@@ -75,12 +72,17 @@ class PermissionsManager {
     return storage.get(permissionName);
   }
 
+  /**
+   * Check if there's a permission registered with provided name.
+   * @param {String} permissionName Permission's name.
+   * @returns {Boolean} True if there's permission registered with provided name.
+   */
   isPermissionRegistered(permissionName) {
     return !!this.getPermission(permissionName);
   }
 
   /**
-   * Locks this instance of PermissionsManager to prevent further modifications.
+   * Locks this instance of PermissionsManager to prevent registering new permissions.
    */
   lock() {
     _isLocked.set(this, true);

@@ -3,166 +3,136 @@ const chai = require('chai');
 
 // Local imports
 const PermissionsManager = require('./permissions-manager');
+const Permission = require('./permission');
 const { Engine: { InvalidOperationError } } = require('../error');
 
 // Test suite setup
 const { expect } = chai;
 
 describe(`PermissionsManager ${__dirname}`, () => {
-  /** @type {String[]} */
-  let permissions;
+  let permission1;
+  let permission2;
+  let permission3;
+  let permissionsList;
 
   /** @type {PermissionsManager} */
   let unitUnderTest;
 
   beforeEach(() => {
-    permissions = ['permission_01', 'permission_02'];
+    permission1 = new Permission('permission_1', 'permission_1_description');
+    permission2 = new Permission('permission_2', 'permission_2_description');
+    permission3 = new Permission('permission_3', 'permission_3_description');
+    permissionsList = [permission3, permission1, permission2];
     unitUnderTest = new PermissionsManager();
   });
 
-  // TODO: Fix UT.
-  describe('PermissionsManager#availablePermissions', () => {
-    it('returns list of registered permissions', () => {
-      // Arrange
-      unitUnderTest.registerPermissions(permissions);
-
-      // Act
-      const result = unitUnderTest.availablePermissions;
-
-      // Assert
-      expect(result).to.deep.equal(permissions);
-    });
-
-    it('cannot be reassigned', () => {
-      // Arrange
-      unitUnderTest.registerPermissions(permissions);
-      const oldValue = unitUnderTest.availablePermissions;
-      const newValue = ['perm_test'];
-
-      // Act
-      unitUnderTest.availablePermissions = newValue;
-
-      // Assert
-      expect(unitUnderTest.availablePermissions).to.deep.equal(oldValue);
-    });
-
-    it('cannot be directly modified', () => {
-      // Arrange
-      const newPermission = 'newPermission';
-
-      // Act
-      unitUnderTest.availablePermissions.push(newPermission);
-
-      // Assert
-      expect(unitUnderTest.availablePermissions).to.not.include(newPermission);
-    });
-  });
-
   describe('PermissionsManager#isLocked', () => {
-    it('returns true when PermissionsManager is locked', () => {
-      // Arrange
-      unitUnderTest.lock();
-
-      // Act
-      const result = unitUnderTest.isLocked;
-
-      // Assert
-      expect(result).to.equal(true);
-    });
-
-    it('returns false if PermissionsManager is not locked', () => {
-      // Act
-      const result = unitUnderTest.isLocked;
-
-      // Assert
-      expect(result).to.equal(false);
-    });
-
-    it('cannot be reassigned', () => {
-      // Arrange
-      unitUnderTest.lock();
-      const oldValue = unitUnderTest.isLocked;
-
-      // Act
-      unitUnderTest.isLocked = false;
-
-      // Assert
-      expect(unitUnderTest.isLocked).to.equal(oldValue);
+    it('returns false by default', () => {
+      expect(unitUnderTest.isLocked).to.equal(false);
     });
   });
 
-  describe('PermissionsManager#registerPermissions(permissions)', () => {
-    it('registers provided permissions within internal storage', () => {
-      // Arrange
-      const morePermissions = ['permission_03', 'permission_04'];
-
-      // Act
-      unitUnderTest.registerPermissions(permissions);
-      unitUnderTest.registerPermissions(morePermissions);
+  describe('PermissionsManager#registerPermission(permission)', () => {
+    it('registers provided permission by within internal storage by it\'s name', () => {
+      // Arrange + Act
+      unitUnderTest.registerPermission(permission1);
 
       // Assert
-      const registeredPermissions = unitUnderTest.availablePermissions;
-      const expectedRegisteredPermissions = permissions.concat(morePermissions);
-      expect(registeredPermissions).to.have.members(expectedRegisteredPermissions);
+      expect(unitUnderTest.getPermission(permission1.name)).to.equal(permission1);
     });
 
     describe('throws InvalidOperationError when...', () => {
-      it('is locked', () => {
+      it('permission is invalid type', () => {
+        // Arrange
+        const invalidPermissionType = { name: 'invalid', description: 'invalid_description' };
+
+        // Act
+        const act = () => unitUnderTest.registerPermission(invalidPermissionType);
+
+        // Assert
+        expect(act).to.throw(InvalidOperationError);
+      });
+
+      it('PermissionsManager is locked', () => {
         // Arrange
         unitUnderTest.lock();
 
         // Act
-        const act = () => unitUnderTest.registerPermissions(permissions);
+        const act = () => unitUnderTest.registerPermission(permission1);
 
         // Assert
         expect(act).to.throw(InvalidOperationError);
       });
 
-      it('is trying to register permission that was already registered', () => {
+      it('there is already permission registered with provided permission#name', () => {
         // Arrange
-        unitUnderTest.registerPermissions(permissions);
-        const duplicatePermissions = [permissions[0]];
+        unitUnderTest.registerPermission(permission1);
+        const permissionWithDuplicatedName = new Permission(permission1.name, 'random_description');
 
         // Act
-        const act = () => unitUnderTest.registerPermissions(duplicatePermissions);
+        const act = () => unitUnderTest.registerPermission(permissionWithDuplicatedName);
 
         // Assert
         expect(act).to.throw(InvalidOperationError);
-      });
-
-      it('is trying to register permissions list that contains duplicates', () => {
-        // Arrange
-        const permission = permissions[0];
-        const duplicatePermissions = [permission, permission];
-
-        // Act
-        const act = () => unitUnderTest.registerPermissions(duplicatePermissions);
-
-        // Assert
-        expect(act).to.throw(InvalidOperationError, 'duplicate entries');
       });
     });
   });
 
-  describe('PermissionsManager#isPermissionRegistered(permission)', () => {
-    it('returns true if provided permission is registered', () => {
+  describe('PermissionsManager#getRegisteredPermissions()', () => {
+    it('returns array of registered permissions sorted by name', () => {
       // Arrange
-      unitUnderTest.registerPermissions(permissions);
-      const permissionToCheck = permissions[0];
+      permissionsList.forEach(p => unitUnderTest.registerPermission(p));
+      const sortedPermissionNames = permissionsList.map(p => p.name).sort();
 
       // Act
-      const result = unitUnderTest.isPermissionRegistered(permissionToCheck);
+      const result = unitUnderTest.getRegisteredPermissions();
+
+      // Assert
+      permissionsList.forEach((permission, index) => {
+        expect(result).to.include(permission, `${permission.name} was not returned.`);
+        expect(result[index].name).to.equal(sortedPermissionNames[index], `List of permissions does not seem to be sorted. ${permission.name} is on invalid position.`);
+      });
+    });
+  });
+
+  describe('PermissionsManager#getPermission(permissionName)', () => {
+    it('returns permission registered with provided permissionName', () => {
+      // Arrange
+      unitUnderTest.registerPermission(permission1);
+
+      // Act
+      const result = unitUnderTest.getPermission(permission1.name);
+
+      // Assert
+      expect(result).to.equal(permission1);
+    });
+
+    describe('when no permission was registered with provided permissionName...', () => {
+      it('returns undefined', () => {
+        // Act
+        const result = unitUnderTest.getPermission(permission1.name);
+
+        // Assert
+        expect(result).to.equal(undefined);
+      });
+    });
+  });
+
+  describe('PermissionsManager#isPermissionRegistered(permissionName)', () => {
+    it('returns true if there is permission registered with provided permissionName', () => {
+      // Arrange
+      unitUnderTest.registerPermission(permission1);
+
+      // Act
+      const result = unitUnderTest.isPermissionRegistered(permission1.name);
 
       // Assert
       expect(result).to.equal(true);
     });
 
-    it('returns false if provided permission is not registered', () => {
-      // Arrange
-      const unregisteredPermission = 'unregistered_permission';
-
+    it('returns false if there is no permission registered with provided permissionName', () => {
       // Act
-      const result = unitUnderTest.isPermissionRegistered(unregisteredPermission);
+      const result = unitUnderTest.isPermissionRegistered(permission1.name);
 
       // Assert
       expect(result).to.equal(false);
@@ -170,7 +140,7 @@ describe(`PermissionsManager ${__dirname}`, () => {
   });
 
   describe('PermissionsManager#lock()', () => {
-    it('locks the instance of permission manager', () => {
+    it('locks PermissionManager', () => {
       // Act
       unitUnderTest.lock();
 
