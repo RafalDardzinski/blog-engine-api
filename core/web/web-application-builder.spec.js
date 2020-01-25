@@ -8,6 +8,7 @@ const WebApplicationBuildStrategy = require('./web-application-build-strategy');
 const Controller = require('./controller');
 const Route = require('./route');
 const { HTTP_METHODS } = require('../generics');
+const { Engine: { InvalidOperationError } } = require('../error');
 
 // Test suite setup
 chai.use(spies);
@@ -32,8 +33,8 @@ class RouterMock {
 }
 
 class ControllerMock extends Controller {
-  constructor() {
-    super('/test');
+  constructor(mountPath = '/test') {
+    super(mountPath);
     this.routes = [];
   }
 
@@ -231,6 +232,7 @@ describe(`WebApplicationBuilder ${__dirname}`, () => {
           .with(r.path, r.handler);
       });
     });
+
     it('returns router', () => {
       // Act
       const result = unitUnderTest.createRouter(controller);
@@ -243,7 +245,7 @@ describe(`WebApplicationBuilder ${__dirname}`, () => {
   describe('WebApplicationBuilder#registerControllers(app, controllers)', () => {
     it('creates router for each controller in controllers', () => {
       // Arrange
-      const controller2 = new ControllerMock();
+      const controller2 = new ControllerMock('/test2');
       const controllers = [controller, controller2];
       sandbox.on(unitUnderTest, 'createRouter');
 
@@ -261,7 +263,7 @@ describe(`WebApplicationBuilder ${__dirname}`, () => {
       // Arrange
       unitUnderTest.createRouter = c => c;
       sandbox.on(webApp, 'use');
-      const controller2 = new ControllerMock();
+      const controller2 = new ControllerMock('/test2');
       const controllers = [controller, controller2];
 
       // Act
@@ -271,6 +273,21 @@ describe(`WebApplicationBuilder ${__dirname}`, () => {
       controllers.forEach((c) => {
         const expectedRouter = unitUnderTest.createRouter(c);
         expect(webApp.use).to.have.been.called.with.exactly(c.mountPath, expectedRouter);
+      });
+    });
+
+    describe('when different controllers use the same \'mountPath\'...', () => {
+      it('throws InvalidOperationError', () => {
+        // Arrange
+        unitUnderTest.createRouter = c => c;
+        const controller2 = new ControllerMock();
+        const controllers = [controller, controller2];
+
+        // Act
+        const act = () => unitUnderTest.registerControllers(webApp, controllers);
+
+        // Assert
+        expect(act).to.throw(InvalidOperationError);
       });
     });
   });

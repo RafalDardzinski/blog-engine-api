@@ -1,3 +1,5 @@
+const { Engine: { InvalidOperationError } } = require('../error');
+
 /**
  * Builds top-level request handler for http server incoming requests.
  */
@@ -46,11 +48,18 @@ class WebApplicationBuilder {
    * Registers controllers on top-level server request handler.
    * @param {Function} app Top level server request handler.
    * @param {Controller[]} controllers Controllers to register.
+   * @throws Each controller must have unique 'mountPath' property.
    */
   registerControllers(app, controllers) {
-    controllers.forEach((c) => {
-      const router = this.createRouter(c);
-      app.use(c.mountPath, router);
+    const mountPaths = controllers.map(c => c.mountPath);
+    controllers.forEach((controller, index) => {
+      const isMountPathDuplicated = mountPaths.indexOf(controller.mountPath) !== index;
+      if (isMountPathDuplicated) {
+        throw new InvalidOperationError(`Path ${controller.mountPath} is used more than once.`);
+      }
+
+      const router = this.createRouter(controller);
+      app.use(controller.mountPath, router);
     });
   }
 }
