@@ -5,11 +5,12 @@ const spies = require('chai-spies');
 // Local imports
 const ApplicationBuilder = require('./builder');
 const Application = require('./application');
+const { DatabaseConnectionManager } = require('../database');
 
 // Mocks
 class WebApplicationBuilderMock {
   build() {
-    return {};
+    return function webApplication() {};
   }
 }
 
@@ -23,7 +24,11 @@ class PermissionsManagerMock {
   lock() {}
 }
 
-class DatabaseConnectionManagerMock {}
+class DatabaseConnectionManagerMock extends DatabaseConnectionManager {
+  constructor() {
+    super(() => null);
+  }
+}
 
 // Test suite setup
 chai.use(spies);

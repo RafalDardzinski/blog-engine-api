@@ -1,6 +1,9 @@
 // TODO: Replace logger with events and observer pattern.
+const Joi = require('@hapi/joi');
+
+const { Engine: { InvalidOperationError } } = require('../error');
 const { LoggerFactory } = require('../logger');
-const { Ensure } = require('../utility');
+const { DatabaseConnectionManager } = require('../database');
 
 const _webApplication = new WeakMap();
 const _databaseConnectionManager = new WeakMap();
@@ -11,8 +14,17 @@ const _logger = new WeakMap();
  */
 class Application {
   constructor(webApplication, databaseConnectionManager) {
-    Ensure.isDefined(webApplication, 'webApplication');
-    Ensure.isDefined(databaseConnectionManager, 'databaseConnectionManager');
+    Joi.assert(
+      webApplication,
+      Joi.function().exist(),
+      new InvalidOperationError('Parameter \'webApplication\' must be defined and must be a function.'),
+    );
+    Joi.assert(
+      databaseConnectionManager,
+      Joi.object().instance(DatabaseConnectionManager).exist(),
+      new InvalidOperationError('Parameter \'databaseConnectionManager\' must be defined and must be an instance of DatabaseConnectionManager.'),
+    );
+
     _webApplication.set(this, webApplication);
     _databaseConnectionManager.set(this, databaseConnectionManager);
     _logger.set(this, LoggerFactory.create());

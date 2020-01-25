@@ -36,6 +36,7 @@ class DatabaseConnectionManagerFactory {
 
 module.exports = {
   DatabaseConnectionManagerFactory,
+  DatabaseConnectionManager,
   Model,
   Repository,
   SchemaBuilder,

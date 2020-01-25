@@ -5,13 +5,20 @@ const chaiAsPromised = require('chai-as-promised');
 
 // Local imports
 const Application = require('./application');
+const { DatabaseConnectionManager } = require('../database');
 
 // Mocks
 class WebApplicationMock {
-
+  createFunction() {
+    return function webApplication() {};
+  }
 }
 
-class DatabaseConnectionManagerMock {
+class DatabaseConnectionManagerMock extends DatabaseConnectionManager {
+  constructor() {
+    super(() => ({ readyState: 1 }));
+  }
+
   connect() {
     return Promise.resolve();
   }
@@ -42,7 +49,7 @@ describe(`Application ${__dirname}`, () => {
   let unitUnderTest;
 
   beforeEach(() => {
-    webApplication = new WebApplicationMock();
+    webApplication = new WebApplicationMock().createFunction();
     databaseConnectionManager = new DatabaseConnectionManagerMock();
     server = new ServerMock();
     unitUnderTest = new Application(webApplication, databaseConnectionManager);
@@ -148,6 +155,7 @@ describe(`Application ${__dirname}`, () => {
         // Arrange
         const serverError = new Error('starting server failed...');
         server.start = () => Promise.reject(serverError);
+        delete databaseConnectionManager.isConnected;
         databaseConnectionManager.isConnected = true;
         sandbox.on(databaseConnectionManager, 'disconnect');
 
