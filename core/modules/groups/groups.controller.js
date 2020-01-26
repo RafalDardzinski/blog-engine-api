@@ -1,4 +1,4 @@
-const { Controller, Route } = require('../../core/web');
+const { Controller, Route } = require('../../web');
 
 class GroupsController extends Controller {
   /**

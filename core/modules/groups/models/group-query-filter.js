@@ -1,4 +1,4 @@
-const { QueryFilter } = require('../../../core').Generics;
+const { QueryFilter } = require('../../../generics');
 
 /**
  * Used for destructuring query input for group searching.

@@ -1,4 +1,4 @@
-const { SchemaPlugin } = require('../../../core/database');
+const { SchemaPlugin } = require('../../../database');
 
 class VirtualsPlugin extends SchemaPlugin {
   /**

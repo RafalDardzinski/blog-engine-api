@@ -1,4 +1,4 @@
-const { DataTransferObject } = require('../../../core').Generics;
+const { DataTransferObject } = require('../../../generics');
 
 /**
  * Used for transferring data from service to controller.

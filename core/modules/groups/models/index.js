@@ -1,4 +1,4 @@
-const { Model, SchemaBuilder } = require('../../../core').Database;
+const { Model, SchemaBuilder } = require('../../../database');
 
 const groupDtos = require('./group.dto');
 const groupDatabaseModelSchema = require('./group.schema');

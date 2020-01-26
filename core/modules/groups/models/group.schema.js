@@ -1,5 +1,5 @@
 const { Schema } = require('mongoose');
-const { permissionSchema } = require('../../../core/authorization');
+const { permissionSchema } = require('../../../authorization');
 
 /**
  * @implements {MongooseSchema}

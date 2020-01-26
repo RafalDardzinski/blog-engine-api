@@ -1,4 +1,4 @@
-const { ApplicationModule } = require('../../core').Application;
+const CoreModule = require('../core-module');
 
 const { repository: usersRepository } = require('../users');
 
@@ -11,4 +11,4 @@ const groupsRepository = new GroupsRepository(groupDatabaseModel);
 const groupsService = new GroupsService(groupsRepository, usersRepository);
 const groupsController = new GroupsController(groupsService);
 
-module.exports = new ApplicationModule(groupsRepository, groupsService, groupsController);
+module.exports = new CoreModule(groupsRepository, groupsService, groupsController);

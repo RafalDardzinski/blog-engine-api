@@ -1,4 +1,4 @@
-const { ApplicationModule } = require('../../core').Application;
+const CoreModule = require('../core-module');
 
 // Imports
 const { userDatabaseModel } = require('./models');
@@ -12,6 +12,6 @@ const usersRepository = new UsersRepository(userDatabaseModel);
 const usersService = new UsersService(usersRepository);
 const usersController = new UsersController(usersService);
 
-module.exports = new ApplicationModule(
+module.exports = new CoreModule(
   usersRepository, usersService, usersController, USERS_PERMISSIONS,
 );

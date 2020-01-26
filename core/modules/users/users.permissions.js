@@ -1,4 +1,4 @@
-const { Permission } = require('../../core/authorization');
+const { Permission } = require('../../authorization');
 
 /**
  * Represents permissions for operations in Users module.

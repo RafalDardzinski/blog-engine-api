@@ -1,4 +1,4 @@
-const { HashSchemaFactory } = require('../../../core/services/hashing');
+const { HashSchemaFactory } = require('../../../services/hashing');
 
 /**
  * Database schema for User.

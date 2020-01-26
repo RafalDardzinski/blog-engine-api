@@ -1,7 +1,4 @@
-const {
-  Database: { Repository },
-  Error: { NotFoundError },
-} = require('../../core');
+const { Repository } = require('../../database');
 
 const _userModel = new WeakMap();
 
@@ -56,21 +53,16 @@ class UsersRepository extends Repository {
    * Changes user's data.
    * @param {Object} userInfo Search criteria to find a user to be updated.
    * @param {Object} newUserInfo New values for existing user's properties.
-   * @throws {NotFoundError} User must exist.
    */
   async update(userInfo, newUserInfo) {
     /** @type {Model} */
-    const userToUpdate = await this.getOne(userInfo);
+    const UserModel = _userModel.get(this).query();
 
-    if (!userToUpdate) {
-      // TODO: move this to service
-      throw new NotFoundError('Provided user cannot be found.');
-    }
-
-    userToUpdate.email = newUserInfo.email || userToUpdate.email;
-    userToUpdate.isActive = newUserInfo.isActive || userToUpdate.isActive;
-
-    return userToUpdate.save();
+    return UserModel.findOneAndUpdate(userInfo, newUserInfo, {
+      runValidators: true,
+      context: 'query',
+      new: true,
+    });
   }
 
   /**

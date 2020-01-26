@@ -1,4 +1,4 @@
-const { SchemaPlugin } = require('../../../core/database');
+const { SchemaPlugin } = require('../../../database');
 
 const _hashingService = new WeakMap();
 

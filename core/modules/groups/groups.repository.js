@@ -1,6 +1,4 @@
-const {
-  Database: { Repository },
-} = require('../../core');
+const { Repository } = require('../../database');
 const { GroupQueryFilter } = require('./models');
 
 const _groupModel = new WeakMap();

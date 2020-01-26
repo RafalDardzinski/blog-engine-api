@@ -1,7 +1,7 @@
 const Joi = require('@hapi/joi');
 
 const { UserDto, UserCreate, UserUpdate } = require('./models');
-const { BusinessLogic: { AuthorizationError, NotFoundError, ValidationError } } = require('../../core/error');
+const { BusinessLogic: { AuthorizationError, NotFoundError, ValidationError } } = require('../../error');
 
 const _usersRepository = new WeakMap();
 
@@ -71,18 +71,10 @@ class UsersService {
     Joi.assert(newUserInfo, Joi.object().exist(), 'Data must be provided and must be an object.');
 
     const updatedProperties = new UserUpdate(newUserInfo);
+    /** @type {UsersRepository} */
     const usersRepository = _usersRepository.get(this);
-
-    try {
-      const user = await usersRepository.update({ username }, updatedProperties);
-      return new UserDto(user);
-    } catch (error) {
-      if (error instanceof NotFoundError) {
-        throw new ValidationError('There is no user with provided username.');
-      }
-
-      throw error;
-    }
+    const updatedUser = await usersRepository.update({ username, updatedProperties });
+    return new UserDto(updatedUser);
   }
 
   /**

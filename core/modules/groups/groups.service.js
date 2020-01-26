@@ -1,6 +1,6 @@
 const Joi = require('@hapi/joi');
 
-const { BusinessLogic: { NotFoundError } } = require('../../core/error');
+const { BusinessLogic: { NotFoundError } } = require('../../error');
 const {
   GroupDto, GroupCreate, GroupUpdate, GroupQueryFilter,
 } = require('./models');

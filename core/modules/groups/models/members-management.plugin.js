@@ -1,7 +1,7 @@
 const Joi = require('@hapi/joi');
 
-const { SchemaPlugin } = require('../../../core/database');
-const { Engine: { InvalidOperationError } } = require('../../../core/error');
+const { SchemaPlugin } = require('../../../database');
+const { Engine: { InvalidOperationError } } = require('../../../error');
 
 /**
  * Checks if provided user instance is valid.
