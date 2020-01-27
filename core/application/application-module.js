@@ -8,9 +8,9 @@ const _permissions = new WeakMap();
  */
 class ApplicationModule {
   /**
-   * @param {Repository} repository Instance of concrete repository.
-   * @param {Service} service Instance of concrete service.
-   * @param {Controller} controller Instance of concrete controller.
+   * @param {Repository} repository Instance of module's repository.
+   * @param {Service} service Instance of module's service.
+   * @param {Controller} controller Instance of module's controller.
    * @param {Object} permissions Set of permissions related to the module.
    */
   constructor(repository, service, controller, permissions = {}) {

@@ -3,7 +3,7 @@ const chai = require('chai');
 const spies = require('chai-spies');
 
 // Local imports
-const ApplicationModule = require('./module');
+const ApplicationModule = require('./application-module');
 
 // Mocks
 class RepositoryMock {
