@@ -67,6 +67,6 @@ class WebApplicationBuilder {
 module.exports = WebApplicationBuilder;
 /**
  * @typedef {import('./web-application-build-strategy')} WebApplicationBuildStrategy
- * @typedef {import('../application/modules-manager')} ApplicationModulesManager
+ * @typedef {import('../application/application-modules-manager')} ApplicationModulesManager
  * @typedef {import('./controller')} Controller
  */
