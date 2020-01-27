@@ -1,9 +1,10 @@
-const { Schema } = require('mongoose');
+const { HashSchemaFactory } = require('../../../services/hashing');
 
 /**
  * Database schema for User.
+ * @implements {MongooseSchema}
  */
-const userModelSchema = new Schema({
+const userSchema = {
   username: {
     type: String,
     required: true,
@@ -13,23 +14,26 @@ const userModelSchema = new Schema({
     immutable: true,
     index: true,
   },
-  // TODO: change for sub-document with hash and salt.
   password: {
-    type: String,
+    type: HashSchemaFactory.create(),
     required: true,
-    minlength: 5,
   },
   email: {
     type: String,
     required: true,
     unique: true,
     index: true,
+    minlength: 5,
+    maxlength: 50,
     match: [/\S+@\S+\.\S+/, 'Provided e-mail address is invalid.'],
   },
   isActive: {
     type: Boolean,
     default: true,
   },
-});
+};
 
-module.exports = userModelSchema;
+module.exports = userSchema;
+/**
+ * @typedef {import('mongoose').Schema} MongooseSchema
+ */

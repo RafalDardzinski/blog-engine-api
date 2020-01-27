@@ -17,7 +17,7 @@ class EnvironmentVariablesMock {
 // Test suite setup
 const { expect } = chai;
 
-describe.only(`HashingServiceConfiguration ${__dirname}`, () => {
+describe(`HashingServiceConfiguration ${__dirname}`, () => {
   let oldEnvVariables;
 
   /** @type {HashingServiceConfiguration} */

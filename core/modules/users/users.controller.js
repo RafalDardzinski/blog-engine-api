@@ -1,4 +1,4 @@
-const { Controller, Route } = require('../../core/web');
+const { Controller, Route } = require('../../web');
 
 class UsersController extends Controller {
   /**
@@ -13,6 +13,7 @@ class UsersController extends Controller {
       new Route('post', '/', this.createUser),
       new Route('delete', '/:username', this.deleteUser),
       new Route('put', '/:username', this.updateUser),
+      new Route('put', '/:username/password', this.changePassword),
     ]);
   }
 
@@ -42,6 +43,14 @@ class UsersController extends Controller {
     const { username } = req.params;
     const updatedUser = await this.usersService.updateUserByUsername(username, req.body);
     res.json(updatedUser);
+  }
+
+  async changePassword(req, res) {
+    const { username } = req.params;
+    const { oldPassword, newPassword } = req.body;
+    await this.usersService.changePassword(username, newPassword, oldPassword);
+
+    res.sendStatus(200);
   }
 }
 

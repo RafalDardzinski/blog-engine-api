@@ -31,6 +31,9 @@ class DatabaseErrorHandler extends IErrorHandler {
       case error.code === 11000:
         return this.handleUniqueIndexError(error);
 
+      case error instanceof MongooseError.CastError:
+        return this.handleCastError(error);
+
       default:
         return null;
     }
@@ -38,7 +41,7 @@ class DatabaseErrorHandler extends IErrorHandler {
 
   /**
    * Handles validation errors.
-   * @param {MongooseError.ValidationError} error Cast error thrown by mongoose.
+   * @param {MongooseError.ValidationError} error Error thrown by mongoose.
    * @returns {Response} Http response.
    */
   handleValidationError(error) {
@@ -54,7 +57,7 @@ class DatabaseErrorHandler extends IErrorHandler {
 
   /**
    * Handles E11000 error.
-   * @param {MongooseError} error Instance of E11000 error.
+   * @param {MongooseError} error Instance of E11000 error thrown by mongoose.
    */
   handleUniqueIndexError(error) {
     let message = 'Validation failed!';
@@ -63,6 +66,19 @@ class DatabaseErrorHandler extends IErrorHandler {
     });
     return new Response(400, message, error);
   }
+
+  /**
+   * Handles cast errors.
+   * @param {CastError} castError Error thrown by mongoose.
+   */
+  handleCastError(castError) {
+    const { kind, value } = castError;
+    const message = `Could not convert ${value} to a type: ${kind}`;
+    return new Response(400, message, castError);
+  }
 }
 
 module.exports = DatabaseErrorHandler;
+/**
+ * @typedef {import('mongoose').Error.CastError} CastError
+ */

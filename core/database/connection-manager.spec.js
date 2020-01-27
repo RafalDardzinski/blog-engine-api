@@ -6,6 +6,7 @@ const spies = require('chai-spies');
 const DatabaseConnectionManager = require('./connection-manager');
 const Model = require('./model');
 const { InvalidOperationError } = require('../error/core');
+const defaultOptions = require('./default-connection-options');
 
 // Mocks
 class ConnectionMock {
@@ -138,6 +139,8 @@ describe(`DatabaseConnectionManager ${__dirname}`, () => {
         someProp: true,
         useUnifiedTopology: false,
       };
+      const expectedOptions = Object.assign({}, defaultOptions, options);
+
       const uri = DatabaseConfigMock.getUri();
       sandbox.on(connection, 'openUri');
 
@@ -146,16 +149,12 @@ describe(`DatabaseConnectionManager ${__dirname}`, () => {
 
       // Assert
       expect(connection.openUri).to.have.been.called
-        .with(uri, options);
+        .with(uri, expectedOptions);
     });
 
     describe('when options are not provided', () => {
       it('connects to the database using default options', async () => {
         // Arrange
-        const defaultOptions = {
-          useNewUrlParser: true,
-          useUnifiedTopology: true,
-        };
         const uri = DatabaseConfigMock.getUri();
         sandbox.on(connection, 'openUri');
 
