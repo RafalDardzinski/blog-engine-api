@@ -1,17 +1,12 @@
 require('dotenv').config();
 
 const {
-  Application,
-  Database,
-  Server,
+  Application: { applicationInitializer },
 } = require('./core');
 const blogModules = require('./blog/modules');
 
 async function Main() {
-  const db = Database.DatabaseConnectionManagerFactory.create('BLOG');
-  const app = Application.applicationFactory.create(blogModules, db);
-  const server = Server.HttpServerFactory.create();
-  await app.run(server);
+  await applicationInitializer.initialize(blogModules, 'BLOG');
 }
 // TODO: Add unexpected errors handling.
 Main();
