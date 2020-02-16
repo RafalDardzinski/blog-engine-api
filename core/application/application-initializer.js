@@ -19,8 +19,9 @@ class ApplicationInitializer {
    * @param {String} databaseConfigPrefix Prefix used to identify db configuration variables.
    */
   initialize(modules, databaseConfigPrefix) {
-    const db = this.databaseConnectionManagerFactory.create(databaseConfigPrefix);
-    const application = this.applicationFactory.create(modules, db);
+    const databaseConnectionManager = this.databaseConnectionManagerFactory
+      .create(databaseConfigPrefix);
+    const application = this.applicationFactory.create(modules, databaseConnectionManager);
     const server = this.serverFactory.create();
     return application.run(server);
   }
