@@ -27,10 +27,10 @@ class DatabaseConnectionManagerFactory {
    */
   static create(configKey) {
     const connectionFactory = mongoose.createConnection.bind(mongoose);
-    const dbCongfig = new DatabaseConfiguration(configKey);
+    const dbConfig = new DatabaseConfiguration(configKey);
     const logger = LoggerFactory.create();
     const dbConnectionObserver = new DatabaseConnectionObserver(logger);
-    return new DatabaseConnectionManager(connectionFactory, dbCongfig, dbConnectionObserver);
+    return new DatabaseConnectionManager(connectionFactory, dbConfig, dbConnectionObserver);
   }
 }
 
