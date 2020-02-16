@@ -12,28 +12,24 @@ class Controller {
   constructor(mountPath) {
     this.mountPath = mountPath;
     this.routes = null;
+
+    /** @type {Map<string, Route>} */
+    this.registeredRoutes = new Map();
   }
 
   /**
    * Determines if controller has routes setup.
    */
   get hasRoutes() {
-    return Array.isArray(this.routes) && !!this.routes.length;
+    return this.registeredRoutes.size > 0;
   }
 
-  /**
-   * Sets up endpoints for the controller.
-   * @param {Route[]} routes Array of controller endpoints.
-   */
-  registerRoutes(routes) {
-    if (!Array.isArray(routes) || !routes.length) {
-      throw new InvalidOperationError('Provided routes argument is not an array or is empty.');
-    }
-    this.routes = [];
-    routes.forEach((r) => {
-      r.setContext(this);
-      this.routes.push(r);
-    });
+  registerRoute(method, mountPath, handler) {
+    const handlerName = handler.name;
+    const route = new Route(method, mountPath, handler);
+    route.setContext(this);
+    this.registeredRoutes.set(handlerName, route);
+    return route;
   }
 
   /**
@@ -46,7 +42,8 @@ class Controller {
       throw new InvalidOperationError('Controller does not have any routes set.');
     }
 
-    const areRoutesValid = this.routes.every(r => r instanceof Route);
+    const areRoutesValid = Array.from(this.registeredRoutes.values())
+      .every(r => r instanceof Route);
     if (!areRoutesValid) {
       throw new InvalidOperationError('Controller#routes must contain only instances of Route class.');
     }

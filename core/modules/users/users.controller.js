@@ -1,4 +1,4 @@
-const { Controller, Route } = require('../../web');
+const { Controller } = require('../../web');
 
 class UsersController extends Controller {
   /**
@@ -7,14 +7,13 @@ class UsersController extends Controller {
   constructor(usersService) {
     super('/users');
     this.usersService = usersService;
-    this.registerRoutes([
-      new Route('get', '/', this.getAllUsers),
-      new Route('get', '/:username', this.getUser),
-      new Route('post', '/', this.createUser),
-      new Route('delete', '/:username', this.deleteUser),
-      new Route('put', '/:username', this.updateUser),
-      new Route('put', '/:username/password', this.changePassword),
-    ]);
+
+    this.registerRoute('get', '/', this.getAllUsers);
+    this.registerRoute('get', '/:username', this.getUser);
+    this.registerRoute('post', '/', this.createUser);
+    this.registerRoute('delete', '/:username', this.deleteUser);
+    this.registerRoute('put', '/:username', this.updateUser);
+    this.registerRoute('put', '/:username/password', this.changePassword);
   }
 
   async getAllUsers(req, res) {

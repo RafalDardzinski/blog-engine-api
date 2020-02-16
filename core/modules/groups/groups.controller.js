@@ -1,4 +1,4 @@
-const { Controller, Route } = require('../../web');
+const { Controller } = require('../../web');
 
 class GroupsController extends Controller {
   /**
@@ -7,17 +7,16 @@ class GroupsController extends Controller {
   constructor(groupsService) {
     super('/groups');
     this.groupsService = groupsService;
-    this.registerRoutes([
-      new Route('post', '/', this.createGroup),
-      new Route('get', '/', this.getGroups),
-      new Route('get', '/:groupId', this.getGroupById),
-      new Route('put', '/:groupId', this.updateGroup),
-      new Route('delete', '/:groupId', this.deleteGroup),
-      new Route('post', '/:groupId/users', this.addUserToGroup),
-      new Route('delete', '/:groupId/users', this.removeUserFromGroup),
-      new Route('post', '/:groupId/permissions', this.addPermissions),
-      new Route('delete', '/:groupId/permissions', this.removePermissions),
-    ]);
+
+    this.registerRoute('post', '/', this.createGroup);
+    this.registerRoute('get', '/', this.getGroups);
+    this.registerRoute('get', '/:groupId', this.getGroupById);
+    this.registerRoute('put', '/:groupId', this.updateGroup);
+    this.registerRoute('delete', '/:groupId', this.deleteGroup);
+    this.registerRoute('post', '/:groupId/users', this.addUserToGroup);
+    this.registerRoute('delete', '/:groupId/users', this.removeUserFromGroup);
+    this.registerRoute('post', '/:groupId/permissions', this.addPermissions);
+    this.registerRoute('delete', '/:groupId/permissions', this.removePermissions);
   }
 
   async createGroup(req, res) {
