@@ -5,6 +5,7 @@
   "main": "app.js",
   "scripts": {
     "test:unit": "NODE_ENV=test mocha \"./{,!(node_modules)/**/}*.spec.js\"",
+    "test:integration": "NODE_ENV=test mocha \"./tests/index.test.js\"",
     "start": "node app.js",
     "start:debug": "NODE_ENV=development node app.js"
   },
