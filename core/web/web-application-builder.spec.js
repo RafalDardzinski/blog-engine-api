@@ -5,7 +5,6 @@ const spies = require('chai-spies');
 // Local imports
 const WebApplicationBuilder = require('./web-application-builder');
 const WebApplicationBuildStrategy = require('./web-application-build-strategy');
-const Controller = require('./controller');
 const Route = require('./route');
 const { HTTP_METHODS } = require('../generics');
 const { Engine: { InvalidOperationError } } = require('../error');
@@ -32,10 +31,10 @@ class RouterMock {
   }
 }
 
-class ControllerMock extends Controller {
+class ControllerMock {
   constructor(mountPath = '/test') {
-    super(mountPath);
-    this.routes = [];
+    this.mountPath = mountPath;
+    this.registeredRoutes = new Map();
   }
 
   validateSelf() {
@@ -204,7 +203,7 @@ describe(`WebApplicationBuilder ${__dirname}`, () => {
       routes.forEach((r) => {
         sandbox.on(r, 'validateSelf');
       });
-      controller.routes = routes;
+      controller.registeredRoutes = routes;
 
       // Act
       unitUnderTest.createRouter(controller);
@@ -215,13 +214,13 @@ describe(`WebApplicationBuilder ${__dirname}`, () => {
       });
     });
 
-    it('register each route to router', () => {
+    it('registers each route to router', () => {
       // Arrange
       const route1 = new RouteMock(HTTP_METHODS.GET, 'test1', () => null);
       const route2 = new RouteMock(HTTP_METHODS.POST, 'test2', () => null);
       const routes = [route1, route2];
       controller = new ControllerMock();
-      controller.routes = routes;
+      controller.registeredRoutes = routes;
 
       // Act
       unitUnderTest.createRouter(controller);
