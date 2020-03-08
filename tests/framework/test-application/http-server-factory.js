@@ -1,11 +1,14 @@
+const TestFactory = require('./test-factory');
 const TestHttpServer = require('./test-http-server');
+
 
 const _applicationComponents = new WeakMap();
 
 /**
  * Creates test http server.
+ * @implements TestFactory
  */
-class TestHttpServerFactory {
+class TestHttpServerFactory extends TestFactory {
   /**
    * Sets application components for later use.
    * @param {ApplicationComponents} applicationComponents Instance of ApplicationComponents.

@@ -2,7 +2,7 @@ const TestDatabaseConnectionManagerFactory = require('./database-connection-mana
 const TestHttpServerFactory = require('./http-server-factory');
 const TestApplicationAssembler = require('./test-application-assembler');
 const ApplicationInitializerFactory = require('./application-initializer-factory');
-const TestApplicationFactory = require('./test-application-factory');
+const TestApplicationFactory = require('./application-factory');
 
 const testDatabaseConnectionManagerFactory = new TestDatabaseConnectionManagerFactory();
 const testServerFactory = new TestHttpServerFactory();

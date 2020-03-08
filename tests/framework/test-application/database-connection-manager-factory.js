@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 
 const { DatabaseConnectionManager } = require('../../../core/database');
 const { DatabaseConfiguration } = require('../../../core/configuration');
+const TestFactory = require('./test-factory');
 
 const _applicationComponents = new WeakMap();
 
@@ -14,8 +15,9 @@ function _connectionFactoryMethod() {
 
 /**
  * Creates DatabaseConnectionManager for test purposes.
+ * @implements TestFactory
  */
-class TestDatabaseConnectionManagerFactory {
+class TestDatabaseConnectionManagerFactory extends TestFactory {
   /**
    * Sets application components to be used later.
    * @param {ApplicationComponents} applicationComponents Instance of ApplicationComponents.

@@ -5,7 +5,7 @@ const spies = require('chai-spies');
 // Local imports
 const { DatabaseConnectionManager } = require('../../../core/database');
 const Application = require('../../../core/application/application');
-const TestApplicationFactory = require('./test-application-factory');
+const TestApplicationFactory = require('./application-factory');
 
 // Mocks
 class ApplicationModulesManagerMock {

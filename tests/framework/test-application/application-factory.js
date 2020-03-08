@@ -2,6 +2,7 @@ const { ApplicationFactory } = require('../../../core/application');
 
 /**
  * Imitates ApplicationFactory for testing purposes.
+ * @implements TestFactory
  */
 class TestApplicationFactory extends ApplicationFactory {
   /**
@@ -30,4 +31,5 @@ class TestApplicationFactory extends ApplicationFactory {
 module.exports = TestApplicationFactory;
 /**
  * @typedef {import('../application-components')} ApplicationComponents
+ * @typedef {import('./test-factory')} TestFactory
  */
