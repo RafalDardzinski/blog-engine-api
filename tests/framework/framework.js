@@ -1,16 +1,13 @@
-const supertest = require('supertest');
-
 const utilities = require('./utilities');
 
-/**
- * @type {Map<Object, TestDataManager>}
- */
+/** @type {Map<Object, TestDataManager>} */
 const _testDataManager = new WeakMap();
 
-/**
- * @type {Map<Object, ApplicationComponents>}
- */
-const _applicationComponents = new WeakMap();
+/** @type {Map<Object, ApplicationComponents>} */
+const _webRequestManager = new WeakMap();
+
+/** @type {Map<Object, String>} */
+const _testedApplicationName = new WeakMap();
 
 /**
  * Provides functionalities that simplify integration tests.
@@ -20,9 +17,10 @@ class TestFramework {
    * @param {TestDataManager} testDataManager Instance of TestDataManager.
    * @param {ApplicationComponents} applicationComponents Instance of ApplicationComponents.
    */
-  constructor(testDataManager, applicationComponents) {
+  constructor(testDataManager, webRequestManager, testedApplicationName) {
     _testDataManager.set(this, testDataManager);
-    _applicationComponents.set(this, applicationComponents);
+    _webRequestManager.set(this, webRequestManager);
+    _testedApplicationName.set(this, testedApplicationName);
   }
 
   /**
@@ -36,9 +34,8 @@ class TestFramework {
   /**
    * Perform operations on built web application.
    */
-  get webRequest() {
-    const { webApp } = _applicationComponents.get(this);
-    return supertest(webApp);
+  get web() {
+    return _webRequestManager.get(this);
   }
 
   /**
@@ -49,8 +46,7 @@ class TestFramework {
   }
 
   get applicationName() {
-    const { applicationName } = _applicationComponents.get(this);
-    return applicationName;
+    return _testedApplicationName.get(this);
   }
 }
 

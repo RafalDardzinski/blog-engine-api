@@ -1,3 +1,4 @@
+const { ApplicationModulesManager } = require('../../core/application');
 const CoreModules = require('../../core/modules');
 const { ExpressWebApplicationBuilderFactory } = require('../../core/web');
 const { permissionsManager } = require('../../core/authorization');
@@ -6,13 +7,10 @@ const {
   TestApplicationFactory,
   applicationInitializerFactory,
 } = require('./test-application');
-const { TestDataManagerFactory, Entity, InitializableEntity } = require('./test-data');
+const { testDataManagerFactory, Entity, InitializableEntity } = require('./test-data');
+const { webRequestManagerFactory } = require('./web');
+
 const FrameworkFactory = require('./framework-factory');
-
-const {
-  ApplicationModulesManager,
-} = require('../../core/application');
-
 const IntegrationTestSuite = require('./integration-test-suite');
 
 // Dependencies setup.
@@ -27,10 +25,13 @@ const applicationFactory = new TestApplicationFactory(
 );
 
 const applicationInitializer = applicationInitializerFactory.create(applicationFactory);
-
 const testApplicationAssembler = new TestApplicationAssembler(applicationInitializer);
-const testDataManager = TestDataManagerFactory.create();
-const frameworkFactory = new FrameworkFactory(testDataManager, testApplicationAssembler);
+
+const frameworkFactory = new FrameworkFactory(
+  testDataManagerFactory,
+  webRequestManagerFactory,
+  testApplicationAssembler,
+);
 
 module.exports = {
   frameworkFactory,

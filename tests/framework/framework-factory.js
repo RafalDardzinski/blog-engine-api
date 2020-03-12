@@ -1,8 +1,11 @@
 const TestFramework = require('./framework');
 const ApplicationComponents = require('./application-components');
 
-/** @type {Map<Object, TestDataManager} */
-const _testDataManager = new WeakMap();
+/** @type {Map<Object, TestDataManagerFactory} */
+const _testDataManagerFactory = new WeakMap();
+
+/** @type {Map<Object, WebRequestFactory>} */
+const _webRequestManagerFactory = new WeakMap();
 
 /** @type {Map<Object, TestApplicationAssembler} */
 const _testApplicationAssembler = new WeakMap();
@@ -13,8 +16,9 @@ class TestFrameworkFactory {
    * @param {TestApplicationAssembler} testApplicationAssembler Instance of
    * TestApplicationAssembler.
    */
-  constructor(testDataManager, testApplicationAssembler) {
-    _testDataManager.set(this, testDataManager);
+  constructor(testDataManagerFactory, webRequestManagerFactory, testApplicationAssembler) {
+    _testDataManagerFactory.set(this, testDataManagerFactory);
+    _webRequestManagerFactory.set(this, webRequestManagerFactory);
     _testApplicationAssembler.set(this, testApplicationAssembler);
   }
 
@@ -23,14 +27,24 @@ class TestFrameworkFactory {
    * @param {Object<string, ApplicationModule>} modules Modules to build application from.
    */
   async create(modules) {
-    const testApplicationAssembler = _testApplicationAssembler.get(this);
-    const testDataManager = _testDataManager.get(this);
-
     const applicationComponents = new ApplicationComponents();
     applicationComponents.setApplicationModules(modules);
+
+    const testApplicationAssembler = _testApplicationAssembler.get(this);
     await testApplicationAssembler.assemble(modules, applicationComponents);
+
+    const testDataManagerFactory = _testDataManagerFactory.get(this);
+    const testDataManager = testDataManagerFactory.create();
     testDataManager.initialize(applicationComponents.databaseConnection);
-    return new TestFramework(testDataManager, applicationComponents);
+
+    const webRequestManagerFactory = _webRequestManagerFactory.get(this);
+    const webRequestManager = webRequestManagerFactory.create(applicationComponents.webApp);
+
+    return new TestFramework(
+      testDataManager,
+      webRequestManager,
+      applicationComponents.applicationName,
+    );
   }
 }
 
@@ -38,6 +52,7 @@ module.exports = TestFrameworkFactory;
 
 /**
  * @typedef {import('./test-application/test-application-assembler')} TestApplicationAssembler
- * @typedef {import('./test-data/test-data-manager')} TestDataManager
+ * @typedef {import('./test-data/test-data-manager-factory')} TestDataManagerFactory
+ * @typedef {import('./web/web-request-manager-factory')} WebRequestFactory
  * @typedef {import('../../core/application/application-module')} ApplicationModule
  */
