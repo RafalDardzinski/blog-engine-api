@@ -1,6 +1,8 @@
 const Route = require('./route');
 const { InvalidOperationError } = require('../error/core');
 
+const _registeredRoutes = new WeakMap();
+
 /**
  * Base controller class.
  * @abstract
@@ -11,44 +13,49 @@ class Controller {
    */
   constructor(mountPath) {
     this.mountPath = mountPath;
-    this.routes = null;
+    _registeredRoutes.set(this, new Map());
   }
 
   /**
    * Determines if controller has routes setup.
+   * @returns {Boolean} True if controller has routes registered.
    */
   get hasRoutes() {
-    return Array.isArray(this.routes) && !!this.routes.length;
+    return this.registeredRoutes.size > 0;
   }
 
   /**
-   * Sets up endpoints for the controller.
-   * @param {Route[]} routes Array of controller endpoints.
+   * Gets a map of routes registered within component.
+   * @returns {Map<string, Route>} Map of registered routes.
    */
-  registerRoutes(routes) {
-    if (!Array.isArray(routes) || !routes.length) {
-      throw new InvalidOperationError('Provided routes argument is not an array or is empty.');
-    }
-    this.routes = [];
-    routes.forEach((r) => {
-      r.setContext(this);
-      this.routes.push(r);
-    });
+  get registeredRoutes() {
+    const routes = _registeredRoutes.get(this);
+    return new Map(routes);
+  }
+
+  /**
+   * Registers handler within controller.
+   * @param {HttpMethod} method Http method that will trigger the handler.
+   * @param {String} mountPath Path that will trigger the handler.
+   * @param {Function} handler Handler function.
+   */
+  registerRoute(method, mountPath, handler) {
+    /** @type {Map<string, Route>} */
+    const routes = _registeredRoutes.get(this);
+    const handlerName = handler.name;
+    const route = new Route(method, mountPath, handler);
+    routes.set(handlerName, route);
+    route.setContext(this);
+    return route;
   }
 
   /**
    * Checks if Controller contains valid properties.
    * @throws {InvalidOperationError} Controller#routes must be non-empty array.
-   * @throws {InvalidOperationError} Controller#routes must only contain instances of Route class.
    */
   validateSelf() {
     if (!this.hasRoutes) {
       throw new InvalidOperationError('Controller does not have any routes set.');
-    }
-
-    const areRoutesValid = this.routes.every(r => r instanceof Route);
-    if (!areRoutesValid) {
-      throw new InvalidOperationError('Controller#routes must contain only instances of Route class.');
     }
   }
 }
@@ -57,4 +64,5 @@ module.exports = Controller;
 /**
  * @typedef {import('./route')} Route
  * @typedef {import('../error/core/invalid-operation')} InvalidOperationError
+ * @typedef {import('../generics/http-methods')} HttpMethod
  */

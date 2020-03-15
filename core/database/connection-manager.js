@@ -73,5 +73,4 @@ class DatabaseConnectionManager {
 module.exports = DatabaseConnectionManager;
 /**
  * @typedef {import('../configuration/database')} DatabaseConfiguration
- * @typedef {import('./model')} Model
  */

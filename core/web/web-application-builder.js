@@ -36,11 +36,12 @@ class WebApplicationBuilder {
   createRouter(controller) {
     controller.validateSelf();
     const router = this.routerFactory();
-    controller.routes.forEach((route) => {
+    controller.registeredRoutes.forEach((route) => {
       route.validateSelf();
       const { method, path, handler } = route;
       router[method](path, handler);
     });
+
     return router;
   }
 

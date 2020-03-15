@@ -50,8 +50,7 @@ class ApplicationModulesManager {
   registerModule(name, applicationModule) {
     Joi.assert(name, Joi.string().exist(), 'Parameter \'name\' must be provided and must be a string.');
     Joi.assert(applicationModule, Joi.object().instance(ApplicationModule).exist(),
-      'Parameter \'applicationModule\' must be provided and must be an instance of ApplicationModule',
-    );
+      'Parameter \'applicationModule\' must be provided and must be an instance of ApplicationModule');
 
     /** @type {Map<string, ApplicationModule>} */
     const modules = _modules.get(this);

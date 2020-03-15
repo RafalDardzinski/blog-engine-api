@@ -4,8 +4,14 @@ const spies = require('chai-spies');
 
 // Local imports
 const Controller = require('./controller');
-const Route = require('./route');
 const { InvalidOperationError } = require('../error/core');
+
+// Mocks
+class HandlerFactory {
+  static create() {
+    return function testHandler() { return true; };
+  }
+}
 
 // Test suite setup
 chai.use(spies);
@@ -13,7 +19,7 @@ const sandbox = chai.spy.sandbox();
 const { expect } = chai;
 
 describe(`Controller ${__dirname}`, () => {
-  const mountPath = 'testMountPath';
+  const mountPath = '/testMountPath';
 
   /** @type {Controller} */
   let unitUnderTest;
@@ -22,134 +28,85 @@ describe(`Controller ${__dirname}`, () => {
     unitUnderTest = new Controller(mountPath);
   });
 
+  afterEach(() => {
+    sandbox.restore();
+  });
+
   describe('constructor(mountPath)', () => {
     it('assigns mountPath to Controller#mountPath', () => {
       // Assert
       expect(unitUnderTest.mountPath).to.equal(mountPath);
     });
 
-    it('assigns null to Controller#routes', () => {
+    it('assigns empty map to Controller#registeredRoutes', () => {
       // Assert
-      expect(unitUnderTest).to.have.property('routes')
-        .that.equals(null);
+      expect(unitUnderTest).to.have.property('registeredRoutes')
+        .that.deep.equals(new Map());
     });
   });
 
   describe('Controller#hasRoutes', () => {
-    describe('when Controller#routes is not an array...', () => {
-      it('returns false', () => {
-        // Arrange + Act
-        unitUnderTest.routes = null;
-
-        // Assert
-        expect(unitUnderTest.hasRoutes).to.equal(false);
-      });
-    });
-
-    describe('when Controller#routes is an empty array...', () => {
-      it('returns false', () => {
-        // Arrange + Act
-        unitUnderTest.routes = [];
-
-        // Assert
-        expect(unitUnderTest.hasRoutes).to.equal(false);
-      });
-    });
-
-    describe('when Controller#routes contains values...', () => {
+    describe('when Controller#registeredRoutes.size is greater than 0...', () => {
       it('returns true', () => {
-        // Arrange + Act
-        unitUnderTest.routes = [{}];
+        // Arrange
+        const testHandler = HandlerFactory.create();
+        unitUnderTest.registerRoute('GET', '/test', testHandler);
+
+        // Act
+        const result = unitUnderTest.hasRoutes;
 
         // Assert
-        expect(unitUnderTest.hasRoutes).to.equal(true);
+        expect(result).to.equal(true);
+      });
+    });
+
+    describe('when Controller#registeredRoutes.size is 0...', () => {
+      it('returns false', () => {
+        // Act
+        const result = unitUnderTest.hasRoutes;
+
+        // Assert
+        expect(result).to.equal(false);
       });
     });
   });
 
-  describe('registerRoutes(routes)', () => {
-    describe('when routes is not an array...', () => {
-      it('throws InvalidOperationError', () => {
-        // Arrange
-        const routes = {};
-
-        // Act
-        const act = () => unitUnderTest.registerRoutes(routes);
-
-        // Assert
-        expect(act).to.throw(InvalidOperationError);
-      });
-    });
-
-    describe('when routes is an empty array...', () => {
-      it('throws InvalidOperationError', () => {
-        // Arrange
-        const routes = [];
-
-        // Act
-        const act = () => unitUnderTest.registerRoutes(routes);
-
-        // Assert
-        expect(act).to.throw(InvalidOperationError);
-      });
-    });
-
-    it('sets each routes context to current instance of controller', () => {
+  describe('registerRoute(method, mountPath, handler)', () => {
+    it('registers route with provided data', () => {
       // Arrange
-      const route1 = new Route('get', 'test1', () => null);
-      const route2 = new Route('get', 'test2', () => null);
-      const routes = [route1, route2];
-      routes.forEach(r => sandbox.on(r, 'setContext'));
+      const testHandler = HandlerFactory.create();
+      const method = 'GET';
+      const path = '/test';
+      const handlerName = testHandler.name;
 
       // Act
-      unitUnderTest.registerRoutes(routes);
+      const result = unitUnderTest.registerRoute(method, path, testHandler);
 
       // Assert
-      routes.forEach((route) => {
-        expect(route.setContext).to.have.been.called.with(unitUnderTest);
-      });
-
-      // Cleanup
-      sandbox.restore();
+      expect(result.path).to.equal(path);
+      expect(result.method).to.equal(method);
+      expect(unitUnderTest.registeredRoutes.get(handlerName)).to.equal(result);
     });
 
-    it('adds each route to Controller#routes', () => {
+    it('sets context of created route\'s handler to controller', () => {
       // Arrange
-      const route1 = new Route('get', 'test1', () => null);
-      const route2 = new Route('get', 'test2', () => null);
-      const routes = [route1, route2];
+      const method = 'GET';
+      const path = '/test';
+      const testHandler = HandlerFactory.create();
+      sandbox.on(testHandler, 'bind');
 
       // Act
-      unitUnderTest.registerRoutes(routes);
+      unitUnderTest.registerRoute(method, path, testHandler);
 
       // Assert
-      routes.forEach((route) => {
-        expect(unitUnderTest.routes).to.contain(route);
-      });
+      expect(testHandler.bind).to.have.been.called
+        .with.exactly(unitUnderTest);
     });
   });
 
   describe('Controller#validateSelf()', () => {
     describe('when controller does not have routes registered', () => {
       it('throws InvalidOperationError', () => {
-        // Arrange
-        unitUnderTest.routes = [];
-
-        // Act
-        const act = () => unitUnderTest.validateSelf();
-
-        // Assert
-        expect(act).to.throw(InvalidOperationError);
-      });
-    });
-
-    describe('when Controller#routes contains object that is not an instance of Router class...', () => {
-      it('throws InvalidOperationError', () => {
-        // Arrange
-        const validRoute = new Route('get', 'test1', () => null);
-        const invalidRoute = { setContext: () => null };
-        unitUnderTest.routes = [validRoute, invalidRoute];
-
         // Act
         const act = () => unitUnderTest.validateSelf();
 

@@ -3,6 +3,8 @@ require('winston-mongodb');
 
 // TODO: Add documentation.
 module.exports = (databaseConfiguration) => {
+  const isTestEnvironment = process.env.NODE_ENV === 'test';
+
   const logger = winston.createLogger({
     transports: [
       new winston.transports.Console({
@@ -21,5 +23,7 @@ module.exports = (databaseConfiguration) => {
       level: 'info',
     }));
   }
+
+  logger.silent = isTestEnvironment;
   return logger;
 };
