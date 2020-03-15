@@ -4,6 +4,9 @@ const { InitializableEntity } = require('../framework').Types;
 
 const hashingService = HashingServiceFactory.create();
 
+/** @type {Map<Object, string>} */
+const _rawPassword = new WeakMap();
+
 /**
  * Represents user entity.
  */
@@ -13,14 +16,19 @@ class UserEntity extends InitializableEntity {
   }) {
     super(userDatabaseModel.name);
     this.username = username;
-    this.password = password;
+    _rawPassword.set(this, password);
+    this.password = null;
     this.email = email;
     this.isActive = isActive || true;
   }
 
   async initialize() {
-    const { value, salt } = await hashingService.hash(this.password);
+    const { value, salt } = await hashingService.hash(this.getRawPassword());
     this.password = { value, salt };
+  }
+
+  getRawPassword() {
+    return _rawPassword.get(this);
   }
 }
 
