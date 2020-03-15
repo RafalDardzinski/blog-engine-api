@@ -9,11 +9,10 @@ class GetUsersTests extends IntegrationTestSuite {
 
   /**
    * Contains set of integration tests.
-   * @param {Object} framework Instance of initialized framework.
+   * @param {TestFramework} framework Instance of initialized framework.
    */
   tests(framework) {
     before(async () => {
-      /** @type {TestFramework} */
       await Users.Administrator.initialize();
       await framework.data.injectTestData([
         Users.Administrator,
@@ -21,7 +20,7 @@ class GetUsersTests extends IntegrationTestSuite {
     });
 
     it('returns 200 status code', async () => {
-      await framework.webRequest.get(this.path).expect(200);
+      await framework.web.request().get(this.path).expect(200);
     });
 
     after(async () => {
