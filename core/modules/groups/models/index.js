@@ -8,12 +8,13 @@ const MembersManagementPlugin = require('./members-management.plugin');
 const PermissionsManagementPlugin = require('./permissions-management.plugin');
 
 const schemaBuilder = new SchemaBuilder();
-schemaBuilder.create(groupDatabaseModelSchema);
-schemaBuilder.addPlugin(new VirtualsPlugin());
-schemaBuilder.addPlugin(new PermissionsManagementPlugin());
-schemaBuilder.addPlugin(new MembersManagementPlugin());
+const groupSchema = schemaBuilder.create(groupDatabaseModelSchema)
+  .addPlugin(new VirtualsPlugin())
+  .addPlugin(new PermissionsManagementPlugin())
+  .addPlugin(new MembersManagementPlugin())
+  .build();
 
-const groupDatabaseModel = new Model('Group', schemaBuilder.build());
+const groupDatabaseModel = new Model('Group', groupSchema);
 
 module.exports = {
   groupDatabaseModel,

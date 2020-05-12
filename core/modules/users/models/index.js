@@ -5,14 +5,13 @@ const userDtos = require('./user.dto');
 const PasswordUtiltitiesPlugin = require('./password-utilities.plugin');
 const userSchemaObj = require('./user.schema');
 
-const schemaBuilder = new SchemaBuilder();
-schemaBuilder.create(userSchemaObj);
-
 const hashingService = HashingServiceFactory.create();
-const passwordUtilities = new PasswordUtiltitiesPlugin(hashingService);
-schemaBuilder.addPlugin(passwordUtilities);
+const schemaBuilder = new SchemaBuilder();
 
-const userSchema = schemaBuilder.build();
+const userSchema = schemaBuilder.create(userSchemaObj)
+  .addPlugin(new PasswordUtiltitiesPlugin(hashingService))
+  .build();
+
 const userDatabaseModel = new Model('User', userSchema);
 
 module.exports = {
