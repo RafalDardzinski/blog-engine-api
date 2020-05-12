@@ -61,6 +61,14 @@ describe(`SchemaBuilder ${__dirname}`, () => {
       expect(resultPaths).to.include.members(schemaObjectPaths);
     });
 
+    it('allows chaining', () => {
+      // Act
+      const result = unitUnderTest.create(schemaObject);
+
+      // Assert
+      expect(result).to.equal(unitUnderTest);
+    });
+
     describe('when called with schemaOptions...', () => {
       it('applies options to a schema', () => {
         // Arrange
@@ -96,6 +104,17 @@ describe(`SchemaBuilder ${__dirname}`, () => {
 
       // Cleanup
       sandbox.restore();
+    });
+
+    it('allows chaining', () => {
+      // Arrange
+      const plugin = new PluginMock();
+
+      // Act
+      const result = unitUnderTest.addPlugin(plugin);
+
+      // Assert
+      expect(result).to.equal(unitUnderTest);
     });
   });
 });

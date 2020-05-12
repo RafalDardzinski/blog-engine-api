@@ -10,6 +10,7 @@ class SchemaBuilder {
    */
   create(schemaObj, schemaOptions = {}) {
     _schema.set(this, new Schema(schemaObj, schemaOptions));
+    return this;
   }
 
   /**
@@ -20,6 +21,7 @@ class SchemaBuilder {
     /** @type {Schema} */
     const schema = _schema.get(this);
     plugin.plugToSchema(schema);
+    return this;
   }
 
   /**
