@@ -1,9 +1,5 @@
 const { HashSchemaFactory } = require('../../../services/hashing');
 
-/**
- * Database schema for User.
- * @implements {MongooseSchema}
- */
 const userSchema = {
   username: {
     type: String,
@@ -34,6 +30,3 @@ const userSchema = {
 };
 
 module.exports = userSchema;
-/**
- * @typedef {import('mongoose').Schema} MongooseSchema
- */

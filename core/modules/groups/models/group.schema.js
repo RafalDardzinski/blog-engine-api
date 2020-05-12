@@ -1,9 +1,6 @@
 const { Schema } = require('mongoose');
 const { permissionSchema } = require('../../../authorization');
 
-/**
- * @implements {MongooseSchema}
- */
 const groupSchema = {
   name: {
     type: String,
@@ -28,6 +25,3 @@ const groupSchema = {
 };
 
 module.exports = groupSchema;
-/**
- * @typedef {import('mongoose').Schema} MongooseSchema
- */
