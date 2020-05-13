@@ -32,30 +32,21 @@ describe(`TokensSigner ${__dirname}`, () => {
   let unitUnderTest;
 
   beforeEach(() => {
-    tokensSignerConfiguration = new TokensSignerConfigurationMock(458, 'testIssuer', 'testSubject', 'testAudience');
+    tokensSignerConfiguration = new TokensSignerConfigurationMock(458, secretBase, 'testSubject', 'testAudience');
     secretGenerationStrategy = new SecretGenerationStrategyMock(saltedSecret);
     unitUnderTest = new TokensSigner(
       tokensSignerConfiguration,
-      secretBase,
       secretGenerationStrategy,
     );
   });
 
-  describe('constructor(tokensSignerConfiguration, secretBase, secretGenerationStrategy)', () => {
+  describe('constructor(tokensSignerConfiguration, secretGenerationStrategy)', () => {
     it('does not expose tokensSignerConfiguration', () => {
       // Act
       const objectValues = Object.values(unitUnderTest);
 
       // Assert
       expect(objectValues).to.not.include(tokensSignerConfiguration);
-    });
-
-    it('does not expose secretBase', () => {
-      // Act
-      const objectValues = Object.values(unitUnderTest);
-
-      // Assert
-      expect(objectValues).to.not.include(secretBase);
     });
 
     it('does not expose secretGenerationStrategy', () => {
@@ -90,44 +81,6 @@ describe(`TokensSigner ${__dirname}`, () => {
         expect(act).to.throw();
       });
 
-      it('secretBase is not a string', () => {
-        // Arrange
-        const invalidArguments = {
-          secretObj: {},
-          secretNumber: 45,
-          secretBool: true,
-          secretSymbol: Symbol('test'),
-        };
-
-        Object.values(invalidArguments).forEach((invalidArgument) => {
-          // Act
-          const act = () => new TokensSigner(
-            tokensSignerConfiguration,
-            invalidArgument,
-            secretGenerationStrategy,
-          );
-
-          // Assert
-          expect(act, `Error was not thrown when argument of type ${typeof invalidArgument} was passed as secretBase.`)
-            .to.throw();
-        });
-      });
-
-      it('secretBase is shorter than 8 characters', () => {
-        // Arrange
-        const tooShortSecret = 'short..';
-
-        // Act
-        const act = () => new TokensSigner(
-          tokensSignerConfiguration,
-          tooShortSecret,
-          secretGenerationStrategy,
-        );
-
-        // Assert
-        expect(act).to.throw();
-      });
-
       it('secretGenerationStrategy is not defined', () => {
         // Act
         const act = () => new TokensSigner(tokensSignerConfiguration, secretBase, undefined);
@@ -153,14 +106,15 @@ describe(`TokensSigner ${__dirname}`, () => {
     });
   });
 
-  describe('TokensSigner#sign(payload, salt)', () => {
+  describe('TokensSigner#sign(payload, salt, audience)', () => {
     it('returns a valid JSON Web Token', async () => {
       // Arrange
       const payload = { testKey: 'testValue' };
       const testSecretSalt = 'testSecretSalt';
+      const audience = 'testAudience';
 
       // Act
-      const result = await unitUnderTest.sign(payload, testSecretSalt);
+      const result = await unitUnderTest.sign(payload, testSecretSalt, audience);
 
       // Assert
       const decodedPayload = jwt.decode(result);
@@ -171,11 +125,12 @@ describe(`TokensSigner ${__dirname}`, () => {
       // Arrange
       const payload = { testKey: 'testValue' };
       const testSecretSalt = 'testSecretSalt';
+      const audience = 'testAudience';
       const secretGeneratedByStrategy = secretGenerationStrategy
         .generateSecret(secretBase, testSecretSalt);
 
       // Act
-      const result = await unitUnderTest.sign(payload, testSecretSalt);
+      const result = await unitUnderTest.sign(payload, testSecretSalt, audience);
 
       // Assert
       const tokenVerificationAction = () => jwt.verify(result, secretGeneratedByStrategy);
@@ -186,9 +141,10 @@ describe(`TokensSigner ${__dirname}`, () => {
       // Arrange
       const payload = { testKey: 'testValue' };
       const testSecretSalt = 'testSecretSalt';
+      const audience = 'testAudience';
 
       // Act
-      const result = await unitUnderTest.sign(payload, testSecretSalt);
+      const result = await unitUnderTest.sign(payload, testSecretSalt, audience);
 
       // Assert
       const decodedPayload = jwt.decode(result);
@@ -199,12 +155,13 @@ describe(`TokensSigner ${__dirname}`, () => {
       // Arrange
       const payload = { testKey: 'testValue' };
       const testSecretSalt = 'testSecretSalt';
+      const audience = 'testAudience';
       const currentDateTimeInSeconds = Math.floor(Date.now() / 1000);
       const tokensValidityPeriod = tokensSignerConfiguration.validityPeriod;
       const expectedExpiryDateTime = currentDateTimeInSeconds + tokensValidityPeriod;
 
       // Act
-      const result = await unitUnderTest.sign(payload, testSecretSalt);
+      const result = await unitUnderTest.sign(payload, testSecretSalt, audience);
 
       // Assert
       const decodedPayload = jwt.decode(result);
@@ -215,14 +172,29 @@ describe(`TokensSigner ${__dirname}`, () => {
       // Arrange
       const payload = { testKey: 'testValue' };
       const testSecretSalt = 'testSecretSalt';
+      const audience = 'testAudience';
       const tokensSubject = tokensSignerConfiguration.subject;
 
       // Act
-      const result = await unitUnderTest.sign(payload, testSecretSalt);
+      const result = await unitUnderTest.sign(payload, testSecretSalt, audience);
 
       // Assert
       const decodedPayload = jwt.decode(result);
       expect(decodedPayload.sub).to.equal(tokensSubject);
+    });
+
+    it('adds audience to created token\'s payload', async () => {
+      // Arrange
+      const payload = { testKey: 'testValue' };
+      const testSecretSalt = 'testSecretSalt';
+      const audience = 'testAudience';
+
+      // Act
+      const result = await unitUnderTest.sign(payload, testSecretSalt, audience);
+
+      // Assert
+      const decodedPayload = jwt.decode(result);
+      expect(decodedPayload.aud).to.equal(audience);
     });
 
     describe('when subject is not defined in configuration...', () => {
@@ -230,17 +202,17 @@ describe(`TokensSigner ${__dirname}`, () => {
         // Arrange
         const payload = { testKey: 'testValue' };
         const testSecretSalt = 'testSecretSalt';
+        const audience = 'testAudience';
         const tokensSignerConfigurationWithoutSubject = new TokensSignerConfiguration(
-          458, 'testIssuer', undefined, 'testAudience',
+          458, 'testSecretBase', 'testIssuer',
         );
         unitUnderTest = new TokensSigner(
           tokensSignerConfigurationWithoutSubject,
-          secretBase,
           secretGenerationStrategy,
         );
 
         // Act
-        const result = await unitUnderTest.sign(payload, testSecretSalt);
+        const result = await unitUnderTest.sign(payload, testSecretSalt, audience);
 
         // Assert
         const decodedPayload = jwt.decode(result);
@@ -249,7 +221,7 @@ describe(`TokensSigner ${__dirname}`, () => {
       });
     });
 
-    describe('when audience is not defined in configuration...', () => {
+    describe('when audience is not provided...', () => {
       it('does not add audience to payload', async () => {
         // Arrange
         const payload = { testKey: 'testValue' };
@@ -259,7 +231,6 @@ describe(`TokensSigner ${__dirname}`, () => {
         );
         unitUnderTest = new TokensSigner(
           tokensSignerConfigurationWithoutSubject,
-          secretBase,
           secretGenerationStrategy,
         );
 
@@ -274,15 +245,16 @@ describe(`TokensSigner ${__dirname}`, () => {
     });
   });
 
-  describe('TokensSigner#verify(signedToken, salt)', () => {
+  describe('TokensSigner#verify(signedToken, salt, audience)', () => {
     it('returns true when token is valid', async () => {
       // Arrange
       const payload = { testKey: 'testValue' };
       const validSalt = 'validSalt';
-      const signedToken = await unitUnderTest.sign(payload, validSalt);
+      const audience = 'testAudience';
+      const signedToken = await unitUnderTest.sign(payload, validSalt, audience);
 
       // Act
-      const result = await unitUnderTest.isTokenValid(signedToken, validSalt);
+      const result = await unitUnderTest.isTokenValid(signedToken, validSalt, audience);
 
       // Assert
       expect(result).to.equal(true);
@@ -292,11 +264,12 @@ describe(`TokensSigner ${__dirname}`, () => {
       // Arrange
       const payload = { testKey: 'testValue' };
       const validSalt = 'validSalt';
+      const audience = 'testAudience';
       const invalidSalt = `${validSalt}-incorrect`;
-      const signedToken = await unitUnderTest.sign(payload, invalidSalt);
+      const signedToken = await unitUnderTest.sign(payload, invalidSalt, audience);
 
       // Act
-      const result = await unitUnderTest.isTokenValid(signedToken, validSalt);
+      const result = await unitUnderTest.isTokenValid(signedToken, validSalt, audience);
 
       // Assert
       expect(result).to.equal(false);

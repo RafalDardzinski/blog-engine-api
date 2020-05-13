@@ -11,7 +11,7 @@ describe(`TokensSignerConfiguration ${__dirname}`, () => {
   let validityPeriod;
   let issuer;
   let subject;
-  let audience;
+  let secretBase;
 
   /** @type {TokensSignerConfiguration} */
   let unitUnderTest;
@@ -20,20 +20,31 @@ describe(`TokensSignerConfiguration ${__dirname}`, () => {
     validityPeriod = 61;
     issuer = 'testIssuer';
     subject = 'testSubject';
-    audience = 'testAudience';
-    unitUnderTest = new TokensSignerConfiguration(validityPeriod, issuer, subject, audience);
+    secretBase = 'testSecretBase';
+    unitUnderTest = new TokensSignerConfiguration(validityPeriod, secretBase, issuer, subject);
   });
 
-  describe('constructor(validityPeriod, issuer, subject, audience)', () => {
+  describe('constructor(validityPeriod, secretBase, issuer, subject)', () => {
     it('assigns validityPeriod to TokensSignerConfiguration#validityPeriod', () => {
       // Arrange
       const testValidityPeriod = validityPeriod + 60;
 
       // Act
-      const result = new TokensSignerConfiguration(testValidityPeriod, issuer, subject, audience);
+      const result = new TokensSignerConfiguration(testValidityPeriod, secretBase, issuer, subject);
 
       // Assert
       expect(result.validityPeriod).to.equal(testValidityPeriod);
+    });
+
+    it('assigns secretBase to TokensSignerConfiguration#secretBase', () => {
+      // Arrange
+      const testSecretBase = `${secretBase}-different`;
+
+      // Act
+      const result = new TokensSignerConfiguration(validityPeriod, testSecretBase, issuer, subject);
+
+      // Assert
+      expect(result.secretBase).to.equal(testSecretBase);
     });
 
     it('assigns issuer to TokensSignerConfiguration#issuer', () => {
@@ -41,7 +52,7 @@ describe(`TokensSignerConfiguration ${__dirname}`, () => {
       const testIssuer = `${issuer}-different`;
 
       // Act
-      const result = new TokensSignerConfiguration(validityPeriod, testIssuer, subject, audience);
+      const result = new TokensSignerConfiguration(validityPeriod, secretBase, testIssuer, subject);
 
       // Assert
       expect(result.issuer).to.equal(testIssuer);
@@ -52,27 +63,16 @@ describe(`TokensSignerConfiguration ${__dirname}`, () => {
       const testSubject = `${subject}-different`;
 
       // Act
-      const result = new TokensSignerConfiguration(validityPeriod, issuer, testSubject, audience);
+      const result = new TokensSignerConfiguration(validityPeriod, secretBase, issuer, testSubject);
 
       // Assert
       expect(result.subject).to.equal(testSubject);
     });
 
-    it('assigns audience to TokensSignerConfiguration#audience', () => {
-      // Arrange
-      const testAudience = `${audience}-different`;
-
-      // Act
-      const result = new TokensSignerConfiguration(validityPeriod, issuer, subject, testAudience);
-
-      // Assert
-      expect(result.audience).to.equal(testAudience);
-    });
-
     describe('throws an error when...', () => {
       it('validityPeriod is not defined', () => {
         // Act
-        const act = () => new TokensSignerConfiguration(undefined, issuer, subject, audience);
+        const act = () => new TokensSignerConfiguration(undefined, secretBase, issuer, subject);
 
         // Assert
         expect(act).to.throw();
@@ -80,22 +80,48 @@ describe(`TokensSignerConfiguration ${__dirname}`, () => {
 
       it('validityPeriod is not a number', () => {
         // Act
-        const act = () => new TokensSignerConfiguration('lorem', issuer, subject, audience);
+        const act = () => new TokensSignerConfiguration('lorem', secretBase, issuer, subject);
 
         // Assert
         expect(act).to.throw();
       });
+
       it('validityPeriod is not greater than 60', () => {
         // Act
-        const act = () => new TokensSignerConfiguration(60, issuer, subject, audience);
+        const act = () => new TokensSignerConfiguration(60, secretBase, issuer, subject);
 
         // Assert
         expect(act).to.throw();
       });
+
+      it('secretBase is not defined', () => {
+        // Act
+        const act = () => new TokensSignerConfiguration(validityPeriod, undefined, issuer, subject);
+
+        // Assert
+        expect(act).to.throw();
+      });
+
+      it('secretBase is not a string', () => {
+        // Act
+        const act = () => new TokensSignerConfiguration(validityPeriod, 45, issuer, subject);
+
+        // Assert
+        expect(act).to.throw();
+      });
+
+      it('secretBase is shorter than 8 characters', () => {
+        // Act
+        const act = () => new TokensSignerConfiguration(validityPeriod, '1234567', issuer, subject);
+
+        // Assert
+        expect(act).to.throw();
+      });
+
       it('issuer is not defined', () => {
         // Act
         const act = () => new TokensSignerConfiguration(
-          validityPeriod, undefined, subject, audience,
+          validityPeriod, secretBase, undefined, subject,
         );
 
         // Assert
@@ -105,7 +131,7 @@ describe(`TokensSignerConfiguration ${__dirname}`, () => {
       it('issuer is not a string', () => {
         // Act
         const act = () => new TokensSignerConfiguration(
-          validityPeriod, 21, subject, audience,
+          validityPeriod, secretBase, 21, subject,
         );
 
         // Assert
@@ -115,7 +141,7 @@ describe(`TokensSignerConfiguration ${__dirname}`, () => {
       it('issuer is shorter than 1 character', () => {
         // Act
         const act = () => new TokensSignerConfiguration(
-          validityPeriod, '', subject, audience,
+          validityPeriod, secretBase, '', subject,
         );
 
         // Assert
@@ -166,17 +192,17 @@ describe(`TokensSignerConfiguration ${__dirname}`, () => {
     });
   });
 
-  describe('TokensSignerConfiguration#audience', () => {
+  describe('TokensSignerConfiguration#secretBase', () => {
     it('is readonly', () => {
       // Arrange
-      const oldValue = unitUnderTest.audience;
-      const newValue = `${unitUnderTest.audience}-different`;
+      const oldValue = unitUnderTest.secretBase;
+      const newValue = `${unitUnderTest.secretBase}-different`;
 
       // Act
-      unitUnderTest.audience = newValue;
+      unitUnderTest.secretBase = newValue;
 
       // Assert
-      expect(unitUnderTest.audience).to.equal(oldValue);
+      expect(unitUnderTest.secretBase).to.equal(oldValue);
     });
   });
 });

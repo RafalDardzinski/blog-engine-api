@@ -7,9 +7,6 @@ const { JsonWebTokenService, JsonWebTokenError } = require('./jwt-service');
 /** @type {WeakMap<Object, TokensSignerConfiguration>} */
 const _tokensSignerConfiguration = new WeakMap();
 
-/** @type {WeakMap<Object, String>} */
-const _secretBase = new WeakMap();
-
 /** @type {WeakMap<Object, SecretGenerationStrategy>} */
 const _secretGenerationStrategy = new WeakMap();
 
@@ -17,20 +14,16 @@ class TokensSigner {
   /**
    * @param {TokensSignerConfiguration} tokensSignerConfiguration Instance of
    * TokensSignerConfiguration.
-   * @param {String} secretBase String used as base for signing tokens.
    * @param {SecretGenerationStrategy} secretGenerationStrategy Provides logic
    * for transmuting secret used for signing tokens.
    * @throws Parameter 'tokensSignerConfiguration' must be an instance of TokensSignerConfiguration.
-   * @throws Parameter 'secretBase' must be a string with at least 8 characters.
    * @throws Parameter 'secretGenerationStrategy' must be an instance of SecretGenerationStrategy.
    */
-  constructor(tokensSignerConfiguration, secretBase, secretGenerationStrategy) {
+  constructor(tokensSignerConfiguration, secretGenerationStrategy) {
     Joi.assert(tokensSignerConfiguration, Joi.object().exist().instance(TokensSignerConfiguration, 'TokensSignerConfiguration'));
-    Joi.assert(secretBase, Joi.string().min(8), 'Parameter \'secretBase\' must be a string with at least 8 characters.');
     Joi.assert(secretGenerationStrategy, Joi.object().exist().instance(SecretGenerationStrategy, 'SecretGenerationStrategy'));
 
     _tokensSignerConfiguration.set(this, tokensSignerConfiguration);
-    _secretBase.set(this, secretBase);
     _secretGenerationStrategy.set(this, secretGenerationStrategy);
   }
 
@@ -39,15 +32,13 @@ class TokensSigner {
    * @param {Object} payload Token's payload.
    * @param {String} salt Salt to transmute the secret with.
    */
-  sign(payload, salt) {
-    const secretGenerationStrategy = _secretGenerationStrategy.get(this);
-    const secretBase = _secretBase.get(this);
-
-    const signingSecret = secretGenerationStrategy.generateSecret(secretBase, salt);
-
+  sign(payload, salt, audience) {
     const {
-      validityPeriod, issuer, subject, audience,
+      validityPeriod, issuer, subject, secretBase,
     } = _tokensSignerConfiguration.get(this);
+
+    const secretGenerationStrategy = _secretGenerationStrategy.get(this);
+    const signingSecret = secretGenerationStrategy.generateSecret(secretBase, salt);
     const options = {
       issuer,
       ...(subject) && { subject },
@@ -63,19 +54,18 @@ class TokensSigner {
    * @param {String} signedToken Signed token.
    * @param {String} salt Salt used to sign provided token.
    */
-  async isTokenValid(signedToken, salt) {
-    const secretGenerationStrategy = _secretGenerationStrategy.get(this);
-    const secretBase = _secretBase.get(this);
-    const signingSecret = secretGenerationStrategy.generateSecret(secretBase, salt);
-
+  async isTokenValid(signedToken, salt, audience) {
     const {
-      issuer, subject, audience,
+      issuer, subject, secretBase,
     } = _tokensSignerConfiguration.get(this);
     const options = {
       issuer,
       ...(subject) && { subject },
       ...(audience) && { audience },
     };
+
+    const secretGenerationStrategy = _secretGenerationStrategy.get(this);
+    const signingSecret = secretGenerationStrategy.generateSecret(secretBase, salt);
 
     try {
       await JsonWebTokenService.verify(signedToken, signingSecret, options);
