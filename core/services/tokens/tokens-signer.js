@@ -2,7 +2,7 @@ const Joi = require('@hapi/joi');
 
 const TokensSignerConfiguration = require('./tokens-signer-configuration');
 const SecretGenerationStrategy = require('./secret-generation-strategy');
-const JsonWebTokenService = require('./jwt-service');
+const { JsonWebTokenService, JsonWebTokenError } = require('./jwt-service');
 
 /** @type {WeakMap<Object, TokensSignerConfiguration>} */
 const _tokensSignerConfiguration = new WeakMap();
@@ -56,6 +56,37 @@ class TokensSigner {
     };
 
     return JsonWebTokenService.sign(payload, signingSecret, options);
+  }
+
+  /**
+   * Verifies if provided token was signed by this instance of TokensSigner.
+   * @param {String} signedToken Signed token.
+   * @param {String} salt Salt used to sign provided token.
+   */
+  async isTokenValid(signedToken, salt) {
+    const secretGenerationStrategy = _secretGenerationStrategy.get(this);
+    const secretBase = _secretBase.get(this);
+    const signingSecret = secretGenerationStrategy.generateSecret(secretBase, salt);
+
+    const {
+      issuer, subject, audience,
+    } = _tokensSignerConfiguration.get(this);
+    const options = {
+      issuer,
+      ...(subject) && { subject },
+      ...(audience) && { audience },
+    };
+
+    try {
+      await JsonWebTokenService.verify(signedToken, signingSecret, options);
+      return true;
+    } catch (e) {
+      if (!(e instanceof JsonWebTokenError)) {
+        throw e;
+      }
+
+      return false;
+    }
   }
 }
 

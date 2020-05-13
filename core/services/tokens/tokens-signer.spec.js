@@ -273,4 +273,33 @@ describe(`TokensSigner ${__dirname}`, () => {
       });
     });
   });
+
+  describe('TokensSigner#verify(signedToken, salt)', () => {
+    it('returns true when token is valid', async () => {
+      // Arrange
+      const payload = { testKey: 'testValue' };
+      const validSalt = 'validSalt';
+      const signedToken = await unitUnderTest.sign(payload, validSalt);
+
+      // Act
+      const result = await unitUnderTest.isTokenValid(signedToken, validSalt);
+
+      // Assert
+      expect(result).to.equal(true);
+    });
+
+    it('returns false when token is not valid', async () => {
+      // Arrange
+      const payload = { testKey: 'testValue' };
+      const validSalt = 'validSalt';
+      const invalidSalt = `${validSalt}-incorrect`;
+      const signedToken = await unitUnderTest.sign(payload, invalidSalt);
+
+      // Act
+      const result = await unitUnderTest.isTokenValid(signedToken, validSalt);
+
+      // Assert
+      expect(result).to.equal(false);
+    });
+  });
 });
