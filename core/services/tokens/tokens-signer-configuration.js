@@ -10,26 +10,28 @@ const _issuer = new WeakMap();
 const _subject = new WeakMap();
 
 /** @type {WeakMap<Object, String>} */
-const _audience = new WeakMap();
+const _secretBase = new WeakMap();
 
 class TokensSignerConfiguration {
   /**
    * @param {Number} validityPeriod Number of seconds after which the
    * token will expire.
+   * @param {String=} secretBase Base part of secret that will be used to sign tokens.
    * @param {String} issuer Name of token's issuer.
    * @param {String=} subject Token's purpose.
-   * @param {String=} audience Name of token's audience.
    * @throws Parameter 'validityPeriod' must be defined number greater than 60.
+   * @throws Parameter 'secretBase' must be a string with at least 8 characters.
    * @throws Parameter 'issuer' must be a defined string with at least 1 character.
    */
-  constructor(validityPeriod, issuer, subject, audience) {
+  constructor(validityPeriod, secretBase, issuer, subject) {
     Joi.assert(validityPeriod, Joi.number().exist().greater(60), 'Parameter \'validityPeriod\' must be defined number greater than 60.');
+    Joi.assert(secretBase, Joi.string().exist().min(8), 'Parameter \'secretBase\' must be a string with at least 8 characters.');
     Joi.assert(issuer, Joi.string().exist().min(1), 'Parameter \'issuer\' must be a defined string with at least 1 character.');
 
     _validityPeriod.set(this, validityPeriod);
+    _secretBase.set(this, secretBase);
     _issuer.set(this, issuer);
     _subject.set(this, subject);
-    _audience.set(this, audience);
   }
 
   get validityPeriod() {
@@ -44,8 +46,8 @@ class TokensSignerConfiguration {
     return _subject.get(this);
   }
 
-  get audience() {
-    return _audience.get(this);
+  get secretBase() {
+    return _secretBase.get(this);
   }
 }
 
