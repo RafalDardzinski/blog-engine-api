@@ -4,7 +4,7 @@ const chai = require('chai');
 const chaiAsPromised = require('chai-as-promised');
 
 // Local imports
-const JsonWebTokenService = require('./jwt-service');
+const { JsonWebTokenService } = require('./jwt-service');
 
 // Mocks
 class TokenPayload {

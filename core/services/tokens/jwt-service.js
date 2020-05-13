@@ -42,4 +42,8 @@ class JsonWebTokenService {
   }
 }
 
-module.exports = JsonWebTokenService;
+const { JsonWebTokenError } = jwt;
+module.exports = {
+  JsonWebTokenError,
+  JsonWebTokenService,
+};
