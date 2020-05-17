@@ -1,4 +1,7 @@
+const Joi = require('@hapi/joi');
+
 const { SchemaPlugin } = require('../../../database');
+const { Engine: { InvalidOperationError } } = require('../../../error');
 
 const _hashingService = new WeakMap();
 
@@ -17,6 +20,12 @@ function _setPassword(hashingService) {
 
 function _checkPassword(hashingService) {
   return async function checkPassword(password) {
+    Joi.assert(
+      this.password,
+      Joi.object().exist(),
+      new InvalidOperationError('Password path is missing!'),
+    );
+
     return hashingService.compare(password, this.password);
   };
 }
