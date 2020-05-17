@@ -16,7 +16,6 @@ function _generateSalt(length) {
  * @param {Number} saltLength Defines length of new salts to be generated.
  */
 function _refreshSalts(saltLength) {
-  console.log(this);
   return async function refreshSalts() {
     const accessSalt = await _generateSalt(saltLength);
     this.set('accessSalt', accessSalt);
