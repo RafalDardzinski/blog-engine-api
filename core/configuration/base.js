@@ -1,5 +1,3 @@
-// TODO: implement this in other configuration classes.
-
 /**
  * Provides utilities to get values from environment variables.
  * @abstract
