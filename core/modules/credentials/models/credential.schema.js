@@ -15,6 +15,16 @@ const credentialSchema = {
     type: Boolean,
     default: true,
   },
+  accessSalt: {
+    type: Buffer,
+    minlength: 32,
+    required: true,
+  },
+  sessionSalt: {
+    type: Buffer,
+    minlength: 32,
+    required: true,
+  },
 };
 
 module.exports = credentialSchema;
