@@ -39,7 +39,7 @@
     "eslint-config-airbnb-base": "^13.2.0",
     "eslint-plugin-import": "^2.18.2",
     "gulp": "^4.0.2",
-    "mocha": "^6.2.2",
+    "mocha": "^10.2.0",
     "supertest": "^4.0.2"
   }
 }
